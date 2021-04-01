@@ -1,5 +1,4 @@
 Input parsers
-===================
 
 This directory contains input data parser modules -- one file (module) per input data format.
 
