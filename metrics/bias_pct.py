@@ -3,6 +3,8 @@
 # assuming x is the truth.
 #
 # Mask invalid values to calculate percentage, in case x is 0.
+#
+# Joseph Lee <joseph.lee@pnnl.gov>
 
 import numpy as np
 
