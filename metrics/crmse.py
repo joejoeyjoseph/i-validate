@@ -1,6 +1,8 @@
 # This performs a centered (or unbiased) root mean squared error (cRMSE)
 # calculation, essentially calculate rmse using de-meaned data:
 # rmse = root(mean( ( (x - mean(x)) - (y - mean(y)) )^2 ))
+#
+# Joseph Lee <joseph.lee@pnnl.gov>
 
 import numpy as np
 
