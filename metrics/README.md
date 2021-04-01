@@ -2,20 +2,28 @@
 
 This directory contains algorithms to compute timeseries comparison metrics.
 
-To add your own, simply copy an existing file or use this interface (template):
+A metric file reads in time series `x` and `y` and compute, where `x` is the baseline (truth or observed) dataset and `y` is the comparison (model) dataset.
+
+To add your own, simply copy an existing file or use the following template:
 
 ```
-# foobarbaz.py
+# The world's best metric.
 #
-# The best metric.
-#
-# Your Name <your.name@someplace.gov>
+# Daenerys Targaryen <daenerys.targaryen@kingslanding.got>
 
-class foobarbaz:
+class dracarys:
 
-  # This function takes two datetime-indexed pandas dataframes as input
-  # and returns a single float value
-  def compute(self,x,y):
-    return None    
+    def compute(self, x, y):
+      return None
 
+```
+
+Please also add unit tests to `test_metrics.py`, as follows:
+
+```
+def test_dracarys():
+
+    metric_obj = eval_tools.get_module_class(test_dir, 'dracarys')()
+
+    assert metric_obj.compute(0, 0) == 0
 ```
