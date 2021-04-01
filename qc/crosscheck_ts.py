@@ -1,4 +1,4 @@
-# Perform crosscheck of two datasets
+# Perform crosscheck between two datasets
 
 import pandas as pd
 import numpy as np
