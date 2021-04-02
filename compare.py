@@ -16,8 +16,8 @@ import pandas as pd
 
 from tools import eval_tools, cal_print_metrics
 
-# config_file = str(pathlib.Path(os.getcwd()).parent)+'/config.yaml'
-config_file = str(pathlib.Path(os.getcwd()).parent)+'/config_test.yaml'
+config_file = str(pathlib.Path(os.getcwd()).parent)+'/config.yaml'
+# config_file = str(pathlib.Path(os.getcwd()).parent)+'/config_test.yaml'
 
 sys.path.append('.')
 
@@ -27,8 +27,8 @@ base = conf['base']
 comp = conf['comp']
 p_curve = conf['power_curve']
 
-print('validation start time:', conf['time']['window']['lower'])
-print('validation end time:', conf['time']['window']['upper'])
+print('validation start time:', conf['time']['window']['start'])
+print('validation end time:', conf['time']['window']['end'])
 print('location:', conf['location'])
 print('baseline dataset:', base['name'])
 print('variable:', conf['plot']['var'])
