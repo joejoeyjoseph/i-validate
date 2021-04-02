@@ -1,14 +1,16 @@
 # i-validate
 
-This infrastructure code enables comparison of time series from arbitrary data sources using user-defined metrics. The tool is designed to be simple, modulized, and extensible.
+This infrastructure code enables comparison of time series from arbitrary data sources using user-defined metrics. The tool is designed to be simple, modulized, and extensible. 
+
+The default branch is `main`, and active development is under `dev`. Pull requests from `dev` to `main` will be done regularly.
 
 ## Installation
 
-### Cloning this repo to your machine
+### Cloning this repo
 
 For Mac users, in Terminal, `cd` to a destinated directory, then
 
-`git clone https://github.com/joejoeyjoseph/i-validate.git`
+`$ git clone https://github.com/joejoeyjoseph/i-validate.git`
 
 For Windows users, [Git for Windows](https://gitforwindows.org/) or running Linux Bash Shell on Windows is an option. 
 
@@ -30,41 +32,50 @@ We use the YAML format for configuration. An example configuration is provided i
 
 First, you need to specify the `location` (assumed to be the WGS84 latitude, `lat`, and longitude, `lon`, coordinates) as well as the evaluation duration in `time` (the `start` and `end` times).
 
-To do a comparison, you will need at least one baseline dataset (called `base`) and one or more datasets to make comparisons to (called `comp`). Each dataset has a data directory (`path`), data parser (`function`), and variable (`var`). The `function` string must match one of the classes in the `inputs` directory.
+To do a comparison, you will need at least one baseline dataset (called `base`) and one or more datasets to make comparisons to (called `comp`). For each dataset, you need to declare the data directory (`path`), data parser (`function`), and variable of interest (`var`). The `function` string must match one of the classes in the `inputs` folder.
 
 If the nature of the variable of interest is wind speed (`ws`), you can choose a wind turbine power curve, specify its data directory (`path`), power curve file (`file`), and data parser (`function`), and the tool will compute metrics based on derived wind power.
 
 Evaluation at different height levels above ground level is available, as long as the height levels exist in the baseline and comparison datasets.
 
-Beyond the datasets, you can list which metrics to compute. Each must correspond to a metric class in the `metrics` directory. You can also specify the variable names (`var`) and units (`units`) to be displayed in the plots. 
+Beyond the datasets, you can list which metrics to compute. Each must correspond to a metric class in the `metrics` folder. You can also specify the variable names (`var`) and units (`units`) to be displayed in the plots. 
 
 Currently, only local datasets are supported. Future versions will fetch data over SFTP (i.e., PNNL DAP) and other protocols.
 
-## Adding Metrics
+## Adding metrics
 
-To add a new metric, create a new file in the metrics folder. The filename must match the class name, so if you wanted to write a script that computes MAE, you might call the file metrics/mae.py and the class inside would also be called mae.
+To add a new metric, create a new file in the `metrics` folder. The file name must match the class name. For example, if you wanted to write a script that computes mean absolute error, or MAE, you would label the file `mae.py` and the class inside would also be called `mae`.
 
-The metric class interface is simple, it defines a single method called 'compute' which takes two variables x (left) and y (right). Both are datetime-indexed pandas dataframes.
+The metric class interface is simple, it defines a single method called `compute` which takes two variables `x` (baseline) and `y` (comparison). Both are datetime-indexed pandas series.
 
-The function compute() must return a float (single, scalar number).
+The function `compute()` must return a float (single, scalar number).
 
-## Adding Inputs
+Unit tests for the metrics are included in `test_metrics.py`. Travis CI should handle the software testing via `pytest`.
 
-To add a new data format (or source), create a new file in the inputs folder. As with metrics, the filename must match the class name. So, if you wanted to parse an HDF5 file you might call it hdf5.py and the class name in the file would also be hdf5.
+## Adding data inputs
 
-The input class interface expects a constructor that takes the path and variable and a single method called get_ts() which takes a location hash with a lat and lon and returns the timeseries (datetime-indexed Pandas dataframe).
+To add a new data format (or source), create a new file in the `inputs` folder. As with metrics, the file name must match the class name. The naming convention is `{data name}_{data format}.py`. For example, if you wanted to parse an HDF5 file with LiDAR data, you might call it `lidar_hdf5.py` and the class name in the file would also be `lidar_hdf5`.
 
-## Adding Preprocessors
+The input class interface expects a constructor that takes the path and variable and a single method called `get_ts()` which returns the time series as a datetime-indexed pandas dataframe.
 
-To add a new preprocessor or QA/QC routine that operates on each timeseries, take a look in the 'prepare' directory.
+## Adding preprocessors
+
+To add a new preprocessor or quality control routine that operates on each time series, please visit the `qc` folder.
 
 ## Parallelism
 
 The current implementation is serial, however future versions may exploit local or distributed parallelism by:
 
-  * Loading timeseries data from files (or cache) in parallel
-  * Computing metrics for each pair of timeseries in parallel
+  * Loading time series data from files (or cache) in parallel
+  * Computing metrics for each pair of time series in parallel
+
+## Community contribution
+
+We encourage and welcome contribution from the wind energy community to this tool.
 
 ## Contact information
 
 Please contact Joseph Lee at <joseph.lee at pnnl.gov> for questions and comments. 
+
+Our contributors in alphabetical order: 
+Larry Berg, Caroline Draxl, Joseph Lee, and Will Shaw. 
