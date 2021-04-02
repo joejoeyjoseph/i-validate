@@ -8,9 +8,9 @@ location:
 time:
   window:
     # validation period start time
-    lower: 2016-09-23 12:00:00
+    start: 2016-09-23 12:00:00
     # validation period end time
-    upper: 2016-09-25 12:00:00
+    end: 2016-09-25 12:00:00
 
 # validation metrics to be calculated and plotted
 metrics:
