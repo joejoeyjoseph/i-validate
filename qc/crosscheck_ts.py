@@ -9,8 +9,8 @@ class crosscheck_ts:
 
     def __init__(self, conf):
 
-        self.upper = conf['time']['window']['upper']
-        self.lower = conf['time']['window']['lower']
+        self.upper = conf['time']['window']['end']
+        self.lower = conf['time']['window']['start']
 
     def trim_ts(self, ts):
         """Trim time series to within upper and lower limits,
