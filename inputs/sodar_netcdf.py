@@ -55,6 +55,4 @@ class sodar_netcdf:
                                                      self.path, self.freq
                                                      )
 
-        print(df.head())
-
         return df
