@@ -81,7 +81,7 @@ The current implementation is serial, however future versions may exploit local 
 
 ## Contributors
 
-The original version of the code was first developed by Caleb Phillips in 2016. Joseph Lee has been building onto Phillips's code and implemented further development since 2020. For questions and comments regarding the current version of the code, please contact Joseph Lee at <joseph.lee at pnnl.gov>.
+The [original version](https://github.com/somerandomsequence/nwtc-ivalidate) of the code was first developed by Caleb Phillips in 2016. Joseph Lee has been building onto Phillips's code and [implemented further development](https://github.com/joejoeyjoseph/nwtc-ivalidate) since 2020. For questions and comments regarding the current version of the code, please contact Joseph Lee at <joseph.lee at pnnl.gov>.
 
 Our contributors in alphabetical order:
 Larry Berg, Caroline Draxl, Joseph Lee, and Will Shaw. 
