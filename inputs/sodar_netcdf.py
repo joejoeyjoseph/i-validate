@@ -15,12 +15,6 @@ class sodar_netcdf:
     Each NetCDF file should contain 1 time step of data.
     """
 
-    # def __init__(self, path, var, target_var):
-
-    #     self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(path)
-    #     self.var = var
-    #     self.target_var = target_var
-
     def __init__(self, info, conf):
 
         self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(info['path'])
