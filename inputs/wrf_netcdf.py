@@ -89,4 +89,7 @@ class wrf_netcdf:
                                                      self.path, self.freq
                                                      )
 
+        print(df.head())
+        print(df[self.target_var].dtype)
+
         return df
