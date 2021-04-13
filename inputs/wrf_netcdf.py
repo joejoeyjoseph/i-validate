@@ -22,14 +22,18 @@ class wrf_netcdf:
     Each NetCDF file should contain 1 time step of data.
     """
 
-    def __init__(self, path, var, target_var):
+    def __init__(self, info, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(path)
-        self.var = var
-        self.target_var = target_var
+        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(info['path'])
+        self.var = info['var']
+        self.target_var = info['target_var']
+        self.freq = info['freq']
+        self.flag = info['flag']
+
+        self.loc = conf['location']
 
     # For WRF mountain wave demo case
-    def get_ij(self, ih, loc):
+    def get_ij(self, ih):
         """Return data index (i and j) for nc file at a specified target
         location.
         """
@@ -43,13 +47,13 @@ class wrf_netcdf:
         # + (lat[y] - loc['lat'])**2, (len(lon), len(lat)), dype=float)
 
         # This is most appropriate for Equator coordinates
-        d = (lat - loc['lat'])**2 + (lon - loc['lon'])**2
+        d = (lat - self.loc['lat'])**2 + (lon - self.loc['lon'])**2
 
         i, j = np.unravel_index(np.argmin(d), d.shape)
 
         return i, j
 
-    def get_ts(self, loc, lev, freq, flag):
+    def get_ts(self, lev):
         """Get time series at a location at a certain height."""
 
         df = pd.DataFrame({'t': [], self.target_var: []})
@@ -60,7 +64,7 @@ class wrf_netcdf:
         for file in os.listdir(self.path):
 
             data = Dataset(self.path+'/'+file, 'r')
-            i, j = self.get_ij(data, loc)
+            i, j = self.get_ij(data)
 
             s = file.split('_')[2]+'_'+file.split('_')[3].split('.')[0]+':'\
                 + file.split('_')[4]+':'+file.split('_')[5].split('.')[0]
@@ -73,7 +77,7 @@ class wrf_netcdf:
             ws = np.sqrt(u**2 + v**2)
 
             ws, mask_i = check_input_data.convert_mask_to_nan(ws, t, mask_i)
-            ws = check_input_data.convert_flag_to_nan(ws, flag, t)
+            ws = check_input_data.convert_flag_to_nan(ws, self.flag, t)
 
             data.close()
 
@@ -82,7 +86,7 @@ class wrf_netcdf:
         df = df.set_index('t').sort_index()
 
         df = check_input_data.verify_data_file_count(df, self.target_var,
-                                                     self.path, freq
+                                                     self.path, self.freq
                                                      )
 
         return df
