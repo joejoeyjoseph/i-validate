@@ -4,7 +4,7 @@
 #
 # Mask invalid values to calculate percentage, in case x is 0.
 #
-# Joseph Lee <joseph.lee@pnnl.gov>
+# Joseph Lee <joseph.lee at pnnl.gov>
 
 import numpy as np
 

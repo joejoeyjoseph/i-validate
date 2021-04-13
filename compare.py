@@ -4,7 +4,7 @@
 # config_test.yaml contains erroneous data that are designed for testing
 # this code.
 #
-# Joseph Lee <joseph.lee@pnnl.gov>
+# Joseph Lee <joseph.lee at pnnl.gov>
 
 import yaml
 import sys
@@ -16,8 +16,10 @@ import pandas as pd
 
 from tools import eval_tools, cal_print_metrics
 
-config_file = str(pathlib.Path(os.getcwd()).parent)+'/config.yaml'
-# config_file = str(pathlib.Path(os.getcwd()).parent)+'/config_test.yaml'
+config_dir = str(pathlib.Path(os.getcwd()).parent)+'/config/'
+
+config_file = config_dir+'config.yaml'
+# config_file = config_dir+'config_test.yaml'
 
 sys.path.append('.')
 
