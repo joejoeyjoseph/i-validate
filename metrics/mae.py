@@ -1,6 +1,6 @@
 # This is a simple average mae calculation, mae = mean(|x - y|).
 #
-# Joseph Lee <joseph.lee@pnnl.gov>
+# Joseph Lee <joseph.lee at pnnl.gov>
 
 import numpy as np
 
