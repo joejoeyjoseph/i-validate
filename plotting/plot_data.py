@@ -18,6 +18,8 @@ class plot_data:
 
         if conf['plot']['units'] == 'ms-1':
             self.units = r'm $s^{-1}$'
+        else:
+            self.units = conf['plot']['units']
 
     def plot_ts_line(self, df, lev, self_units=True):
         """Represent time series for each data column as a line,
