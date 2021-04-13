@@ -42,7 +42,7 @@ def compare(config=None):
 
     # Load modules
     metrics = [eval_tools.get_module_class('metrics', m)()
-            for m in conf['metrics']]
+               for m in conf['metrics']]
     crosscheck_ts = eval_tools.get_module_class('qc', 'crosscheck_ts')(conf)
     plotting = eval_tools.get_module_class('plotting', 'plot_data')(conf)
 
@@ -56,17 +56,16 @@ def compare(config=None):
 
         print()
         print('######################### height a.g.l.: '+str(lev)
-            + ' '+conf['levels']['height_units']+' #########################'
-            )
+              + ' '+conf['levels']['height_units']+' #########################'
+              )
         print()
         print('********** for '+base['name']+': **********')
 
         # Run __init__
-        base['input'] = eval_tools.get_module_class('inputs', base['function'])(
-            base['path'], base['var'], base['target_var']
-            )
+        base['input'] = eval_tools.get_module_class(
+            'inputs', base['function'])(base, conf)
 
-        base['data'] = base['input'].get_ts(lev, base['freq'], base['flag'])
+        base['data'] = base['input'].get_ts(lev)
 
         # For each specified comparison dataset
         for ind, c in enumerate(comp):
@@ -75,13 +74,10 @@ def compare(config=None):
             print('********** for '+c['name']+': **********')
 
             # Run __init__
-            c['input'] = eval_tools.get_module_class('inputs', c['function'])(
-                c['path'], c['var'], c['target_var']
-                )
+            c['input'] = eval_tools.get_module_class(
+                'inputs', c['function'])(c, conf)
 
-            c['data'] = c['input'].get_ts(conf['location'], lev, c['freq'],
-                                        c['flag']
-                                        )
+            c['data'] = c['input'].get_ts(lev)
 
             results = eval_tools.append_results(results, base, c, conf)
 
@@ -119,8 +115,9 @@ def compare(config=None):
 
             print()
             print('######################### deriving wind power at '
-                + str(p_curve['hub_height'])+' '+conf['levels']['height_units']
-                + ' #########################')
+                  + str(p_curve['hub_height'])
+                  + ' '+conf['levels']['height_units']
+                  + ' #########################')
             print()
             print('use power curve: '+p_curve['file'])
 
@@ -128,7 +125,8 @@ def compare(config=None):
 
             hhws_df = all_lev_df.xs(hh, level=0, axis=1)
 
-            pc_csv = eval_tools.get_module_class('inputs', p_curve['function'])(
+            pc_csv = eval_tools.get_module_class(
+                'inputs', p_curve['function'])(
                 p_curve['path'], p_curve['file'], p_curve['ws'],
                 p_curve['power'], hhws_df, hh, conf
                 )
@@ -151,6 +149,6 @@ def compare(config=None):
 
             print('not deriving power for '+c['name']+',')
             print('either baseline and compare data are not wind speed,\n'
-                + 'or hub height does not exist in validation data,\n'
-                + 'hence power curve is not derived'
-                )
+                  + 'or hub height does not exist in validation data,\n'
+                  + 'hence power curve is not derived'
+                  )
