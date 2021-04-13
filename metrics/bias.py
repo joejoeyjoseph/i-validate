@@ -2,7 +2,7 @@
 # bias = mean(y - x),
 # assuming x is the truth.
 #
-# Joseph Lee <joseph.lee@pnnl.gov>
+# Joseph Lee <joseph.lee at pnnl.gov>
 
 import numpy as np
 

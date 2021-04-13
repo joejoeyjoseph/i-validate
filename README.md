@@ -73,9 +73,9 @@ The current implementation is serial, however future versions may exploit local 
 
 We encourage and welcome contribution from the wind energy community to this tool.
 
-## Contact information
+## Contributors
 
-Please contact Joseph Lee at <joseph.lee at pnnl.gov> for questions and comments. 
+The original version of the code was first developed by Caleb Phillips in 2016. Joseph Lee has been building onto Phillips's code and implemented further development since 2020. Regarding the current version of the code, please contact Joseph Lee at <joseph.lee at pnnl.gov> for questions and comments. 
 
 Our contributors in alphabetical order: 
 Larry Berg, Caroline Draxl, Joseph Lee, and Will Shaw. 
