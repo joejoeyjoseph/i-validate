@@ -57,6 +57,8 @@ class fino2_dat:
             out_df.rename(columns={self.var: var_name}, inplace=True)
             out_df = out_df.astype(float)
 
+            return out_df
+
         else:
 
             print('!!!!!!!!!!')
@@ -65,5 +67,3 @@ class fino2_dat:
             print('!!!!!!!!!!')
 
             sys.exit()
-
-            return out_df
