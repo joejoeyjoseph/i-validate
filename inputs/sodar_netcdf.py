@@ -2,7 +2,7 @@
 
 import os
 import pathlib
-from datetime import datetime
+import datetime
 from netCDF4 import Dataset
 import numpy as np
 import pandas as pd
@@ -36,7 +36,11 @@ class sodar_netcdf:
             data = Dataset(self.path+'/'+file, 'r')
 
             s = '_'.join(file.split('.')[3:5])
-            t = datetime.strptime(s, '%Y%m%d_%H%M%S')
+            # Sodar data should be in UTC time
+            t = datetime.datetime.strptime(s, '%Y%m%d_%H%M%S')
+            # If time needs to be offset to UTC time
+            # t = datetime.datetime.strptime(s, '%Y%m%d_%H%M%S')
+            #     + datetime.timedelta(hours=7)
 
             height_ind = np.where(data['height'][:].data == lev)[0][0]
 
