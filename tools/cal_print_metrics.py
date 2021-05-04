@@ -5,6 +5,29 @@ import itertools
 from tools import eval_tools
 
 
+def remove_na(combine_df, ramp_txt=False):
+
+    compute_df = combine_df.dropna()
+
+    only_na = combine_df[~combine_df.index.isin(compute_df.index)]
+
+    if ramp_txt is True:
+        ramp_txt = 'ramp '
+    else:
+        ramp_txt = ''
+
+    print()
+    print('to calculate '+ramp_txt+'metrics, removing the following time steps'
+          + ' that contain NaN values:'
+          )
+    print(only_na.index.strftime('%Y-%m-%d %H:%M:%S').values)
+    print()
+    print('hence, only use '+str(len(compute_df))
+          + ' time steps in data to calculate '+ramp_txt+'metrics')
+
+    return compute_df
+
+
 def run(combine_df, metrics, results, ind, c, conf, base, lev):
     """Calculate metrics and print results.
     Remove NaNs in data frame.
@@ -13,18 +36,7 @@ def run(combine_df, metrics, results, ind, c, conf, base, lev):
     Calculate and print metrics, as listed in the yaml file.
     """
 
-    compute_df = combine_df.dropna()
-
-    only_na = combine_df[~combine_df.index.isin(compute_df.index)]
-
-    print()
-    print('to calculate metrics, removing the following time steps'
-          + ' that contain NaN values:'
-          )
-    print(only_na.index.strftime('%Y-%m-%d %H:%M:%S').values)
-    print()
-    print('hence, only use '+str(len(compute_df))
-          + ' time steps in data to calculate metrics')
+    compute_df = remove_na(combine_df)
 
     # For future purposes,
     # In case of reading in mulitple compare data columns
@@ -34,41 +46,41 @@ def run(combine_df, metrics, results, ind, c, conf, base, lev):
         x = compute_df[pair[0]]
         y = compute_df[pair[1]]
 
-    if len(x) != len(y):
+        if len(x) != len(y):
 
-        sys.exit('Lengths of baseline and compare datasets are'
-                 + ' not equal!'
-                 )
+            sys.exit('Lengths of baseline and compare datasets are'
+                     + ' not equal!'
+                     )
 
-    if base['nature'] == 'wd' and c['nature'] == 'wd':
+        if base['nature'] == 'wd' and c['nature'] == 'wd':
+
+            print()
+            print('calculating differences in wind directions after converting'
+                  + ' them into unit vectors')
+
+            y = eval_tools.get_wd_angle_diff_series(x, y)
+            # x as baseline, is set to zero
+            x = np.zeros(len(y))
+
+        for m in metrics:
+
+            results[ind][m.__class__.__name__] = m.compute(x, y)
 
         print()
-        print('calculating differences in wind directions after converting'
-              + ' them into unit vectors')
+        print('==-- '+conf['plot']['var']+' metrics: '+c['name']+' - '
+              + base['name']+' at '+str(lev)+' '
+              + conf['levels']['height_units']+' --=='
+              )
+        print()
 
-        y = eval_tools.get_wd_angle_diff_series(x, y)
-        # x as baseline, is set to zero
-        x = np.zeros(len(y))
+        for key, val in results[0].items():
 
-    for m in metrics:
+            if isinstance(val, float):
 
-        results[ind][m.__class__.__name__] = m.compute(x, y)
+                end_units = ''
+                suffix_pct = 'pct'
 
-    print()
-    print('==-- '+conf['plot']['var']+' metrics: '+c['name']+' - '
-          + base['name']+' at '+str(lev)+' '
-          + conf['levels']['height_units']+' --=='
-          )
-    print()
+                if str(key).endswith(suffix_pct):
+                    end_units = '%'
 
-    for key, val in results[0].items():
-
-        if isinstance(val, float):
-
-            end_units = ''
-            suffix_pct = 'pct'
-
-            if str(key).endswith(suffix_pct):
-                end_units = '%'
-
-            print(str(key)+': '+str(np.round(val, 3))+end_units)
+                print(str(key)+': '+str(np.round(val, 3))+end_units)
