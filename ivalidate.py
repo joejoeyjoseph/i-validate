@@ -114,48 +114,48 @@ def compare(config=None):
 
                     ramp_df = process_ramp.run()
 
-                    print(ramp_df.head())
-                    ramp_df['time'] = ramp_df.index
-                    # ramp_df.loc[ramp_df['true_negative'] == False, 'true_negative'] = np.NaN
-                    ramp_df['value_grp'] = (ramp_df.true_negative.diff(1) != 0).astype('int').cumsum()
-                    print(ramp_df.head(20))
-                    # print(ramp_df.groupby('value_grp'))
+                    plot_ramp = eval_tools.get_module_class(
+                        'plotting', 'plot_ramp')(ramp_df, combine_df, conf)
+
+                    plot_ramp.plot_ts_contingency()
+
+                    # ramp_df['time'] = ramp_df.index
+
+                    # ramp_df['tn_group'] = (ramp_df['true_negative'].diff(1) != 0).astype('int').cumsum()
+                    # tn_true = ramp_df.loc[ramp_df['true_negative'] == True]
                     
-                    print(ramp_df.loc[ramp_df['true_negative'] == True].groupby('value_grp')['time'].first())
+                    # duration_df = pd.DataFrame(
+                    #     {'start': tn_true.groupby('tn_group')['time'].first(),
+                    #      'end': tn_true.groupby('tn_group')['time'].last()}
+                    #     )
 
-                    plotting.plot_ts_line(combine_df, lev)
+                    # fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
 
-                    import matplotlib.pyplot as plt
+                    # ramp_df.index = ramp_df.index + (pd.to_timedelta(
+                    #     str(conf['ramps']['duration']))/2)
 
-                    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+                    # ramp_df.loc[ramp_df['abs_diff_base'] == 0, 'abs_diff_base'] = np.NaN
+                    # ramp_df.loc[ramp_df['abs_diff_comp'] == 0, 'abs_diff_comp'] = np.NaN
+                    # ramp_df['abs_diff_comp'] = ramp_df['abs_diff_comp'] - 0.1
 
-                    # print(ramp_df.index)
-                    ramp_df.index = ramp_df.index + (pd.to_timedelta(
-                        str(conf['ramps']['duration']))/2)
-                    # print(ramp_df.index)
+                    # for col in combine_df.columns:
+                    #     ax1.plot(combine_df.index, combine_df[col], label=col)
 
-                    ramp_df.loc[ramp_df['abs_diff_base'] == 0, 'abs_diff_base'] = np.NaN
-                    ramp_df.loc[ramp_df['abs_diff_comp'] == 0, 'abs_diff_comp'] = np.NaN
-                    ramp_df['abs_diff_comp'] = ramp_df['abs_diff_comp'] - 0.1
+                    # ax2.tick_params(left=False, labelleft=False)
 
-                    for col in combine_df.columns:
-                        ax1.plot(combine_df.index, combine_df[col], label=col)
+                    # ax2.scatter(ramp_df.index, ramp_df['abs_diff_base'])
+                    # ax2.scatter(ramp_df.index, ramp_df['abs_diff_comp'])
 
-                    ax2.tick_params(left=False, labelleft=False)
+                    # ax2.axvspan(duration_df['start'].iloc[0], duration_df['end'].iloc[0], 0.8, 1)
+                    # ax2.axvspan(duration_df['start'].iloc[1], duration_df['end'].iloc[1], 0.4, 0.5)
+                    # ax2.axvspan(duration_df['start'].iloc[2], duration_df['end'].iloc[2])
 
-                    # ax1 = plotting.plot_ts_line(combine_df, lev)
+                    # ax2.set_ylim([0.8, 1.1])
+                    # # ax2.set_xticklabels(ax2.get_xticks(), rotation=90)
+                    # ax2.tick_params(axis='x', labelrotation=90)
+                    # # ax2.set_xticks(rotation=90)
 
-                    ax2.scatter(ramp_df.index, ramp_df['abs_diff_base'])
-                    ax2.scatter(ramp_df.index, ramp_df['abs_diff_comp'])
-
-                    axvspan
-
-                    ax2.set_ylim([0.8, 1.1])
-                    # ax2.set_xticklabels(ax2.get_xticks(), rotation=90)
-                    ax2.tick_params(axis='x', labelrotation=90)
-                    # ax2.set_xticks(rotation=90)
-
-                    plt.show()
+                    # plt.show()
 
             combine_df.columns = pd.MultiIndex.from_product([[lev],
                                                             combine_df.columns]
