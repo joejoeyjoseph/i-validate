@@ -34,12 +34,12 @@ def compare(config=None):
     comp = conf['comp']
     p_curve = conf['power_curve']
 
-    if 'ramps' in conf:
-        print(conf['ramps']['definition'])
-        # eval_tools.get_module_class('ramps', 'crosscheck_ts')(conf)
-        ramps = [eval_tools.get_module_class('ramps', r)()
-                 for r in conf['ramps']['definition']]
-        print(ramps)
+    # if 'ramps' in conf:
+    #     print(conf['ramps']['definition'])
+    #     # eval_tools.get_module_class('ramps', 'crosscheck_ts')(conf)
+    #     ramps = [eval_tools.get_module_class('ramps', r)()
+    #              for r in conf['ramps']['definition']]
+    #     print(ramps)
     # print((conf['ramps']))
     # print(conf in globals())
 
@@ -102,22 +102,39 @@ def compare(config=None):
             plotting.plot_histogram(combine_df, lev)
             plotting.plot_pair_scatter(combine_df, lev)
 
-            # import datetime
-            ramp_data = cal_print_metrics.remove_na(combine_df, ramp_txt=True)
+            if 'ramps' in conf:
 
-            ramp_data_dn = ramp_data.copy()
-            ramp_data_dn.index = ramp_data_dn.index - pd.to_timedelta(
-                str(conf['ramps']['duration']))
+                ramp_data = cal_print_metrics.remove_na(
+                    combine_df, ramp_txt=True
+                    )
 
-            ramp_df = (ramp_data_dn - ramp_data).dropna()
-            zeros_col = np.zeros(len(ramp_df))
-            ramp_df['abs_diff_base'] = zeros_col
-            ramp_df['abs_diff_comp'] = zeros_col
+                ramps = [eval_tools.get_module_class(
+                    'ramps', r)(conf, ramp_data)
+                    for r in conf['ramps']['definition']
+                    ]
+                # print(ramps)
 
-            ramp_df.loc[abs(ramp_df['sodar_ws'])
-                > conf['ramps']['magnitude'], ['abs_diff_base']] = 1
-            ramp_df.loc[abs(ramp_df['wrf_ws'])
-                > conf['ramps']['magnitude'], ['abs_diff_comp']] = 1
+                for r in ramps:
+
+                    ramp_df = r.get_df()
+
+            # # import datetime
+            # ramp_data = cal_print_metrics.remove_na(combine_df, ramp_txt=True)
+
+            # ramp_data_dn = ramp_data.copy()
+            # ramp_data_dn.index = ramp_data_dn.index - pd.to_timedelta(
+            #     str(conf['ramps']['duration']))
+
+            # ramp_df = (ramp_data_dn - ramp_data).dropna()
+            # zeros_col = np.zeros(len(ramp_df))
+            # ramp_df['abs_diff_base'] = zeros_col
+            # ramp_df['abs_diff_comp'] = zeros_col
+
+            # ramp_df.loc[abs(ramp_df['sodar_ws'])
+            #     > conf['ramps']['magnitude'], ['abs_diff_base']] = 1
+            # ramp_df.loc[abs(ramp_df['wrf_ws'])
+            #     > conf['ramps']['magnitude'], ['abs_diff_comp']] = 1
+                
 
             false_col = np.zeros(len(ramp_df), dtype=bool)
             ramp_df['true_positive'] = false_col
