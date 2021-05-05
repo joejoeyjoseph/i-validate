@@ -1,4 +1,4 @@
-# Ramp change rate
+# Ramp magnitude
 #
 # Joseph Lee <joseph.lee at pnnl.gov>
 
