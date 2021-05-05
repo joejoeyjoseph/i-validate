@@ -34,15 +34,6 @@ def compare(config=None):
     comp = conf['comp']
     p_curve = conf['power_curve']
 
-    # if 'ramps' in conf:
-    #     print(conf['ramps']['definition'])
-    #     # eval_tools.get_module_class('ramps', 'crosscheck_ts')(conf)
-    #     ramps = [eval_tools.get_module_class('ramps', r)()
-    #              for r in conf['ramps']['definition']]
-    #     print(ramps)
-    # print((conf['ramps']))
-    # print(conf in globals())
-
     print('validation start time:', conf['time']['window']['start'])
     print('validation end time:', conf['time']['window']['end'])
     print('location:', conf['location'])
@@ -52,7 +43,7 @@ def compare(config=None):
     # Load modules
     metrics = [eval_tools.get_module_class('metrics', m)()
                for m in conf['metrics']]
-    print(metrics)
+
     crosscheck_ts = eval_tools.get_module_class('qc', 'crosscheck_ts')(conf)
     plotting = eval_tools.get_module_class('plotting', 'plot_data')(conf)
 
@@ -108,68 +99,63 @@ def compare(config=None):
                     combine_df, ramp_txt=True
                     )
 
-                ramps = [eval_tools.get_module_class(
+                ramp_method = [eval_tools.get_module_class(
                     'ramps', r)(conf, ramp_data)
                     for r in conf['ramps']['definition']
                     ]
                 # print(ramps)
 
-                for r in ramps:
+                for r in ramp_method:
 
                     ramp_df = r.get_df()
 
-            # # import datetime
-            # ramp_data = cal_print_metrics.remove_na(combine_df, ramp_txt=True)
+                    process_ramp = eval_tools.get_module_class(
+                        'ramps', 'process_rampdf')(ramp_df)
 
-            # ramp_data_dn = ramp_data.copy()
-            # ramp_data_dn.index = ramp_data_dn.index - pd.to_timedelta(
-            #     str(conf['ramps']['duration']))
+                    ramp_df = process_ramp.run()
 
-            # ramp_df = (ramp_data_dn - ramp_data).dropna()
-            # zeros_col = np.zeros(len(ramp_df))
-            # ramp_df['abs_diff_base'] = zeros_col
-            # ramp_df['abs_diff_comp'] = zeros_col
+                    print(ramp_df.head())
+                    ramp_df['time'] = ramp_df.index
+                    # ramp_df.loc[ramp_df['true_negative'] == False, 'true_negative'] = np.NaN
+                    ramp_df['value_grp'] = (ramp_df.true_negative.diff(1) != 0).astype('int').cumsum()
+                    print(ramp_df.head(20))
+                    # print(ramp_df.groupby('value_grp'))
+                    
+                    print(ramp_df.loc[ramp_df['true_negative'] == True].groupby('value_grp')['time'].first())
 
-            # ramp_df.loc[abs(ramp_df['sodar_ws'])
-            #     > conf['ramps']['magnitude'], ['abs_diff_base']] = 1
-            # ramp_df.loc[abs(ramp_df['wrf_ws'])
-            #     > conf['ramps']['magnitude'], ['abs_diff_comp']] = 1
-                
+                    plotting.plot_ts_line(combine_df, lev)
 
-            false_col = np.zeros(len(ramp_df), dtype=bool)
-            ramp_df['true_positive'] = false_col
-            ramp_df['false_positive'] = false_col
-            ramp_df['false_negative'] = false_col
-            ramp_df['true_negative'] = false_col
+                    import matplotlib.pyplot as plt
 
-            ramp_df.loc[((ramp_df['abs_diff_base'] != 0) & (ramp_df['abs_diff_comp'] != 0)), ['true_positive']] = True
-            ramp_df.loc[((ramp_df['abs_diff_base'] == 0) & (ramp_df['abs_diff_comp'] != 0)), ['false_positive']] = True
-            ramp_df.loc[((ramp_df['abs_diff_base'] != 0) & (ramp_df['abs_diff_comp'] == 0)), ['false_negative']] = True
-            ramp_df.loc[((ramp_df['abs_diff_base'] == 0) & (ramp_df['abs_diff_comp'] == 0)), ['true_negative']] = True
+                    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
 
-            for i, row in ramp_df.iterrows():
-                assert np.sum([row['true_positive'], row['false_positive'], row['false_negative'], row['true_negative']]) == 1
+                    # print(ramp_df.index)
+                    ramp_df.index = ramp_df.index + (pd.to_timedelta(
+                        str(conf['ramps']['duration']))/2)
+                    # print(ramp_df.index)
 
-            true_pos = ramp_df['true_positive'].sum()
-            false_pos = ramp_df['false_positive'].sum()
-            false_neg = ramp_df['false_negative'].sum()
-            true_neg = ramp_df['true_negative'].sum()
+                    ramp_df.loc[ramp_df['abs_diff_base'] == 0, 'abs_diff_base'] = np.NaN
+                    ramp_df.loc[ramp_df['abs_diff_comp'] == 0, 'abs_diff_comp'] = np.NaN
+                    ramp_df['abs_diff_comp'] = ramp_df['abs_diff_comp'] - 0.1
 
-            assert true_pos+false_pos+false_neg+true_neg == len(ramp_df)
+                    for col in combine_df.columns:
+                        ax1.plot(combine_df.index, combine_df[col], label=col)
 
-            pod = true_pos/(true_pos+false_neg)
-            print(pod)
-            csi = true_pos/(true_pos+false_pos+false_neg)
-            print(csi)
-            fbias = (true_pos+false_pos)/(true_pos+false_neg)
-            far = false_pos/(true_pos+false_pos)
-            print(fbias, far)
+                    ax2.tick_params(left=False, labelleft=False)
 
-            fa = true_pos/(true_pos+false_pos)
+                    # ax1 = plotting.plot_ts_line(combine_df, lev)
 
-            # TF = true_pos, FF = false_pos, MR = false_neg, TN = true_neg
-            pss = ((true_pos*true_neg) - (false_pos*false_neg)) / ((true_pos+false_neg) * (false_pos+true_neg))
-            print(fa, pss)
+                    ax2.scatter(ramp_df.index, ramp_df['abs_diff_base'])
+                    ax2.scatter(ramp_df.index, ramp_df['abs_diff_comp'])
+
+                    axvspan
+
+                    ax2.set_ylim([0.8, 1.1])
+                    # ax2.set_xticklabels(ax2.get_xticks(), rotation=90)
+                    ax2.tick_params(axis='x', labelrotation=90)
+                    # ax2.set_xticks(rotation=90)
+
+                    plt.show()
 
             combine_df.columns = pd.MultiIndex.from_product([[lev],
                                                             combine_df.columns]
@@ -227,6 +213,7 @@ def compare(config=None):
 
         else:
 
+            print()
             print('not deriving power for '+c['name']+',')
             print('either baseline and compare data are not wind speed,\n'
                   + 'or hub height does not exist in validation data,\n'
