@@ -57,7 +57,8 @@ def compare(config=None):
 
         print()
         print('######################### height a.g.l.: '+str(lev)
-              + ' '+conf['levels']['height_units']+' #########################'
+              + ' '+conf['levels']['height_units']
+              + ' #########################'
               )
         print()
         print('********** for '+base['name']+': **********')
@@ -103,14 +104,17 @@ def compare(config=None):
                     'ramps', r)(conf, ramp_data)
                     for r in conf['ramps']['definition']
                     ]
-                # print(ramps)
 
                 for r in ramp_method:
+
+                    print()
+                    print('@@~~ using ramp definition: '
+                          + r.__class__.__name__+' ~~@@')
 
                     ramp_df = r.get_df()
 
                     process_ramp = eval_tools.get_module_class(
-                        'ramps', 'process_rampdf')(ramp_df)
+                        'ramps', 'process_ramp')(ramp_df)
 
                     ramp_df = process_ramp.run()
 
@@ -119,48 +123,11 @@ def compare(config=None):
 
                     plot_ramp.plot_ts_contingency()
 
-                    # ramp_df['time'] = ramp_df.index
-
-                    # ramp_df['tn_group'] = (ramp_df['true_negative'].diff(1) != 0).astype('int').cumsum()
-                    # tn_true = ramp_df.loc[ramp_df['true_negative'] == True]
-                    
-                    # duration_df = pd.DataFrame(
-                    #     {'start': tn_true.groupby('tn_group')['time'].first(),
-                    #      'end': tn_true.groupby('tn_group')['time'].last()}
-                    #     )
-
-                    # fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
-
-                    # ramp_df.index = ramp_df.index + (pd.to_timedelta(
-                    #     str(conf['ramps']['duration']))/2)
-
-                    # ramp_df.loc[ramp_df['abs_diff_base'] == 0, 'abs_diff_base'] = np.NaN
-                    # ramp_df.loc[ramp_df['abs_diff_comp'] == 0, 'abs_diff_comp'] = np.NaN
-                    # ramp_df['abs_diff_comp'] = ramp_df['abs_diff_comp'] - 0.1
-
-                    # for col in combine_df.columns:
-                    #     ax1.plot(combine_df.index, combine_df[col], label=col)
-
-                    # ax2.tick_params(left=False, labelleft=False)
-
-                    # ax2.scatter(ramp_df.index, ramp_df['abs_diff_base'])
-                    # ax2.scatter(ramp_df.index, ramp_df['abs_diff_comp'])
-
-                    # ax2.axvspan(duration_df['start'].iloc[0], duration_df['end'].iloc[0], 0.8, 1)
-                    # ax2.axvspan(duration_df['start'].iloc[1], duration_df['end'].iloc[1], 0.4, 0.5)
-                    # ax2.axvspan(duration_df['start'].iloc[2], duration_df['end'].iloc[2])
-
-                    # ax2.set_ylim([0.8, 1.1])
-                    # # ax2.set_xticklabels(ax2.get_xticks(), rotation=90)
-                    # ax2.tick_params(axis='x', labelrotation=90)
-                    # # ax2.set_xticks(rotation=90)
-
-                    # plt.show()
+                    process_ramp.cal_print_scores()
 
             combine_df.columns = pd.MultiIndex.from_product([[lev],
                                                             combine_df.columns]
                                                             )
-
 
             if all_lev_df.empty:
                 all_lev_df = all_lev_df.append(combine_df)
