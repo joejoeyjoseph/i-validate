@@ -76,7 +76,7 @@ metrics:
 ramps:
   definition: 
     - r_magnitude
-    - r_change_rate
+    # - r_change_rate
   # in units of base var
   magnitude: 2
   # in %
