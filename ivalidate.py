@@ -43,6 +43,7 @@ def compare(config=None):
     # Load modules
     metrics = [eval_tools.get_module_class('metrics', m)()
                for m in conf['metrics']]
+
     crosscheck_ts = eval_tools.get_module_class('qc', 'crosscheck_ts')(conf)
     plotting = eval_tools.get_module_class('plotting', 'plot_data')(conf)
 
@@ -56,7 +57,8 @@ def compare(config=None):
 
         print()
         print('######################### height a.g.l.: '+str(lev)
-              + ' '+conf['levels']['height_units']+' #########################'
+              + ' '+conf['levels']['height_units']
+              + ' #########################'
               )
         print()
         print('********** for '+base['name']+': **********')
@@ -91,6 +93,37 @@ def compare(config=None):
             plotting.plot_ts_line(combine_df, lev)
             plotting.plot_histogram(combine_df, lev)
             plotting.plot_pair_scatter(combine_df, lev)
+
+            if 'ramps' in conf:
+
+                ramp_data = cal_print_metrics.remove_na(
+                    combine_df, ramp_txt=True
+                    )
+
+                ramp_method = [eval_tools.get_module_class(
+                    'ramps', r)(conf, ramp_data)
+                    for r in conf['ramps']['definition']
+                    ]
+
+                for r in ramp_method:
+
+                    print()
+                    print('@@~~ using ramp definition: '
+                          + r.__class__.__name__+' ~~@@')
+
+                    ramp_df = r.get_df()
+
+                    process_ramp = eval_tools.get_module_class(
+                        'ramps', 'process_ramp')(ramp_df)
+
+                    ramp_df = process_ramp.run()
+
+                    plot_ramp = eval_tools.get_module_class(
+                        'plotting', 'plot_ramp')(ramp_df, combine_df, conf)
+
+                    plot_ramp.plot_ts_contingency()
+
+                    process_ramp.cal_print_scores()
 
             combine_df.columns = pd.MultiIndex.from_product([[lev],
                                                             combine_df.columns]
@@ -147,6 +180,7 @@ def compare(config=None):
 
         else:
 
+            print()
             print('not deriving power for '+c['name']+',')
             print('either baseline and compare data are not wind speed,\n'
                   + 'or hub height does not exist in validation data,\n'
