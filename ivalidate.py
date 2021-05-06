@@ -101,7 +101,7 @@ def compare(config=None):
                     )
 
                 ramp_method = [eval_tools.get_module_class(
-                    'ramps', r)(conf, ramp_data)
+                    'ramps', r)(conf, c, ramp_data)
                     for r in conf['ramps']['definition']
                     ]
 
@@ -111,7 +111,7 @@ def compare(config=None):
                     print('@@~~ using ramp definition: '
                           + r.__class__.__name__+' ~~@@')
 
-                    ramp_df = r.get_df()
+                    ramp_df = r.get_rampdf()
 
                     process_ramp = eval_tools.get_module_class(
                         'ramps', 'process_ramp')(ramp_df)

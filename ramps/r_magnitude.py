@@ -10,12 +10,14 @@ from tools import cal_print_metrics
 
 class r_magnitude:
 
-    def __init__(self, conf, ramp_data):
+    def __init__(self, conf, c, ramp_data):
 
         self.conf = conf
+        self.base_var = conf['base']['target_var']
+        self.comp_var = c['target_var']
         self.ramp_data = ramp_data
 
-    def get_df(self):
+    def get_rampdf(self):
 
         ramp_data_dn = self.ramp_data.copy()
         ramp_data_dn.index = ramp_data_dn.index - pd.to_timedelta(
@@ -26,9 +28,9 @@ class r_magnitude:
         ramp_df['abs_diff_base'] = zeros_col
         ramp_df['abs_diff_comp'] = zeros_col
 
-        ramp_df.loc[abs(ramp_df['sodar_ws'])
+        ramp_df.loc[abs(ramp_df[self.base_var])
                     > self.conf['ramps']['magnitude'], ['abs_diff_base']] = 1
-        ramp_df.loc[abs(ramp_df['wrf_ws'])
+        ramp_df.loc[abs(ramp_df[self.comp_var])
                     > self.conf['ramps']['magnitude'], ['abs_diff_comp']] = 1
 
         return ramp_df
