@@ -7,12 +7,16 @@ import pandas as pd
 
 
 class process_ramp:
+    """Class to process ramp results."""
 
     def __init__(self, ramp_df):
 
         self.df = ramp_df
 
     def add_contingency_table(self):
+        """Categorize ramp forecast accuracy between baseline ramps
+        and comparison ramps based on a 2x2 contingency table.
+        """
 
         false_col = np.zeros(len(self.df), dtype=bool)
         self.df['true_positive'] = false_col
@@ -33,6 +37,8 @@ class process_ramp:
                     & (self.df['comp_ramp'] == 0)),
                     ['true_negative']] = True
 
+        # Confirm that only 1 of 4 categories contains a True signal
+        # for each time step
         for i, row in self.df.iterrows():
             assert np.sum([row['true_positive'], row['false_positive'],
                    row['false_negative'], row['true_negative']]) == 1
@@ -48,6 +54,7 @@ class process_ramp:
         return self.df
 
     def cal_print_scores(self):
+        """Calculate and print different skill scores."""
 
         pod = self.true_pos/(self.true_pos+self.false_neg)
         print('Probability of detection, or Ramp capture, or Hit percentage '
