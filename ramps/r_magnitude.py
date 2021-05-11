@@ -21,7 +21,7 @@ class r_magnitude:
     def get_rampdf(self):
 
         print()
-        print('classfy a ramp event when '+self.reference['var']
+        print('classfy as a ramp event when '+self.reference['var']
               + ' exceeds |'+str(self.ramps['magnitude'])
               + '| '+self.reference['units']+' in a window of '
               + self.ramps['duration']
@@ -33,12 +33,12 @@ class r_magnitude:
 
         ramp_df = (ramp_data_dn - self.ramp_data).dropna()
         zeros_col = np.zeros(len(ramp_df))
-        ramp_df['abs_diff_base'] = zeros_col
-        ramp_df['abs_diff_comp'] = zeros_col
+        ramp_df['base_ramp'] = zeros_col
+        ramp_df['comp_ramp'] = zeros_col
 
         ramp_df.loc[abs(ramp_df[self.base_var])
-                    > self.ramps['magnitude'], ['abs_diff_base']] = 1
+                    > self.ramps['magnitude'], ['base_ramp']] = 1
         ramp_df.loc[abs(ramp_df[self.comp_var])
-                    > self.ramps['magnitude'], ['abs_diff_comp']] = 1
+                    > self.ramps['magnitude'], ['comp_ramp']] = 1
 
         return ramp_df

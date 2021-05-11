@@ -52,9 +52,9 @@ class plot_ramp:
 
         fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8))
 
-        self.df.loc[self.df['abs_diff_base'] == 0, 'abs_diff_base'] = np.NaN
-        self.df.loc[self.df['abs_diff_comp'] == 0, 'abs_diff_comp'] = np.NaN
-        self.df['abs_diff_comp'] = self.df['abs_diff_comp'] - 0.1
+        self.df.loc[self.df['base_ramp'] == 0, 'base_ramp'] = np.NaN
+        self.df.loc[self.df['comp_ramp'] == 0, 'comp_ramp'] = np.NaN
+        self.df['comp_ramp'] = self.df['comp_ramp'] - 0.1
 
         for col in self.combine_df.columns:
             ax1.plot(self.combine_df.index, self.combine_df[col], label=col)
@@ -65,9 +65,9 @@ class plot_ramp:
 
         ax2.tick_params(left=False, labelleft=False)
 
-        ax2.scatter(self.df.index, self.df['abs_diff_base'],
+        ax2.scatter(self.df.index, self.df['base_ramp'],
                     label='baseline ramp')
-        ax2.scatter(self.df.index, self.df['abs_diff_comp'],
+        ax2.scatter(self.df.index, self.df['comp_ramp'],
                     label='comparison ramp')
 
         def plot_duration_df(df, y_min, y_max, color):
