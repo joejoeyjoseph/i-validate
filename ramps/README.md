@@ -25,4 +25,4 @@ class sōvētēs:
 
 The `process_ramp.py` script compares baseline and comparison ramps and categorize results based on a 2x2 contingency table, calculate ramp skill scores, etc.
 
-Please also add unit tests to `test_r_def.py`. 
+Please also add unit tests to `test_ramps.py`. 
