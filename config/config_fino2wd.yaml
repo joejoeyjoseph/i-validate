@@ -68,9 +68,9 @@ comp:
 # power curve
 power_curve: 
 
-# plotting 
-plot: 
+# reference
+reference: 
   # variable name to be displayed
-  var: wind direction
+  plot_var: wind direction
   # variable units
   units: deg

@@ -25,7 +25,7 @@ class pc_csv:
         self.hh = hub_height
         self.conf = conf
 
-        self.conf['plot']['var'] = self.power
+        self.conf['reference']['plot_var'] = self.power
         self.plotting = eval_tools.get_module_class('plotting', 'plot_data')(
             self.conf)
 

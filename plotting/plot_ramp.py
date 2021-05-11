@@ -9,17 +9,19 @@ import itertools
 class plot_ramp:
     """Class for plotting 1 dimensional data at 1 height level."""
 
-    def __init__(self, ramp_df, combine_df, conf):
+    def __init__(self, ramp_df, combine_df, conf, lev):
 
         self.df = ramp_df
         self.combine_df = combine_df
         self.duration = conf['ramps']['duration']
+        self.var = conf['reference']['plot_var']
+        self.lev_units = conf['levels']['height_units']
+        self.lev = lev
 
-        self.var = conf['plot']['var']
-        if conf['plot']['units'] == 'ms-1':
+        if conf['reference']['units'] == 'ms-1':
             self.units = r'm $s^{-1}$'
         else:
-            self.units = conf['plot']['units']
+            self.units = conf['reference']['units']
 
     def get_duration_df(self, col):
 
@@ -57,6 +59,7 @@ class plot_ramp:
         for col in self.combine_df.columns:
             ax1.plot(self.combine_df.index, self.combine_df[col], label=col)
 
+        ax1.set_title('comparison at '+str(self.lev)+' '+self.lev_units)
         ax1.set_ylabel(self.var+' ('+self.units+')')
         ax1.legend()
 
@@ -79,6 +82,7 @@ class plot_ramp:
         plot_duration_df(fn_df, 0, 0.2, 'purple')
 
         ax2.set_ylim([0.7, 1.2])
+        ax2.set_ylabel('periods of classified ramps & forecast results')
         ax2.tick_params(axis='x', labelrotation=90)
         ax2.set_xlabel('time')
         ax2.legend()
