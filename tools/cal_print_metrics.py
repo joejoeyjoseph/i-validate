@@ -67,8 +67,8 @@ def run(combine_df, metrics, results, ind, c, conf, base, lev):
             results[ind][m.__class__.__name__] = m.compute(x, y)
 
         print()
-        print('==-- '+conf['plot']['var']+' metrics: '+c['name']+' - '
-              + base['name']+' at '+str(lev)+' '
+        print('==-- '+conf['reference']['plot_var']+' metrics: '+c['name']
+              + ' - '+base['name']+' at '+str(lev)+' '
               + conf['levels']['height_units']+' --=='
               )
         print()

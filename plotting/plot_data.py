@@ -13,13 +13,13 @@ class plot_data:
 
     def __init__(self, conf):
 
-        self.var = conf['plot']['var']
+        self.var = conf['reference']['plot_var']
         self.lev_units = conf['levels']['height_units']
 
-        if conf['plot']['units'] == 'ms-1':
+        if conf['reference']['units'] == 'ms-1':
             self.units = r'm $s^{-1}$'
         else:
-            self.units = conf['plot']['units']
+            self.units = conf['reference']['units']
 
     def plot_ts_line(self, df, lev, self_units=True):
         """Represent time series for each data column as a line,
@@ -39,7 +39,7 @@ class plot_data:
         else:
             plt.ylabel(self.var)
 
-        plt.title(self.var+' at '+str(lev)+' m a.g.l.')
+        plt.title(self.var+' at '+str(lev)+' '+self.lev_units+' a.g.l.')
 
         plt.show()
 
@@ -115,6 +115,6 @@ class plot_data:
 
         plt.xlabel(self.var+' ('+self.units+')')
         plt.ylabel('count')
-        plt.title(self.var+' at '+str(lev)+' m a.g.l.')
+        plt.title(self.var+' at '+str(lev)+' '+self.lev_units+' a.g.l.')
 
         plt.show()
