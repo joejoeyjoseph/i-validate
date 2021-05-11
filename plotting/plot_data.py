@@ -13,7 +13,7 @@ class plot_data:
 
     def __init__(self, conf):
 
-        self.var = conf['reference']['plot_var']
+        self.var = conf['reference']['var']
         self.lev_units = conf['levels']['height_units']
 
         if conf['reference']['units'] == 'ms-1':

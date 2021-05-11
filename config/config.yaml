@@ -87,6 +87,6 @@ power_curve:
 # reference
 reference: 
   # variable name to be displayed
-  plot_var: wind speed
+  var: wind speed
   # variable units
   units: ms-1

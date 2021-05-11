@@ -14,7 +14,7 @@ class plot_ramp:
         self.df = ramp_df
         self.combine_df = combine_df
         self.duration = conf['ramps']['duration']
-        self.var = conf['reference']['plot_var']
+        self.var = conf['reference']['var']
         self.lev_units = conf['levels']['height_units']
         self.lev = lev
 
