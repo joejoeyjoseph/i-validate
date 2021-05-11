@@ -50,20 +50,16 @@ class process_ramp:
 
     def cal_print_scores(self):
 
-        print()
-
         pod = self.true_pos/(self.true_pos+self.false_neg)
         print('Probability of detection, or Ramp capture, or Hit percentage')
         print('(the fraction of observed ramp events that are actually')
         print('forecasted): '+str(np.round(pod, 3)))
-        # print(np.round(pod, 3))
         print()
 
         csi = self.true_pos/(self.true_pos+self.false_pos+self.false_neg)
         print('Critical success index (the fraction of observed and/or')
         print('forecasted events that are correctly predicted), where')
         print('1 is perfect prediction: '+str(np.round(csi, 3)))
-        # print(np.round(csi, 3))
         print()
 
         fbias = (self.true_pos+self.false_pos)/(self.true_pos+self.false_neg)
@@ -72,22 +68,18 @@ class process_ramp:
         print('where a negative value represents the system tends to')
         print('underforecast and a positive value represents the system')
         print('tends to overforecast: '+str(np.round(fbias, 3)))
-        # print(np.round(fbias, 3))
         print()
 
         far = self.false_pos/(self.true_pos+self.false_pos)
         print('False alarm ratio (the fraction of predicted ramp events')
-        print('that did not occur):')
-        print(np.round(far, 3))
+        print('that did not occur):'+str(np.round(far, 3)))
         print()
 
         fa = self.true_pos/(self.true_pos+self.false_pos)
         print('Forecast accuracy, or Success ratio (the fraction of ')
         print('predicted YES events that occurred): '+str(np.round(fa, 3)))
-        # print(np.round(fa, 3))
 
         pss = ((self.true_pos*self.true_neg)
                - (self.false_pos*self.false_neg))\
             / ((self.true_pos+self.false_neg)
                * (self.false_pos+self.true_neg))
-        # print()
