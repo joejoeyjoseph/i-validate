@@ -38,7 +38,7 @@ def compare(config=None):
     print('validation end time:', conf['time']['window']['end'])
     print('location:', conf['location'])
     print('baseline dataset:', base['name'])
-    print('variable:', conf['plot']['var'])
+    print('variable:', conf['reference']['var'])
 
     # Load modules
     metrics = [eval_tools.get_module_class('metrics', m)()
@@ -108,9 +108,10 @@ def compare(config=None):
                 for r in ramp_method:
 
                     print()
-                    print('@@~~ using ramp definition: '
+                    print('@@~~ calculating ramp skill scores at '+str(lev)
+                          + ' '+conf['levels']['height_units']
+                          + ' using definition: '
                           + r.__class__.__name__+' ~~@@')
-                    print()
 
                     ramp_df = r.get_rampdf()
 
@@ -120,7 +121,8 @@ def compare(config=None):
                     ramp_df = process_ramp.run()
 
                     plot_ramp = eval_tools.get_module_class(
-                        'plotting', 'plot_ramp')(ramp_df, combine_df, conf)
+                        'plotting', 'plot_ramp')(
+                            ramp_df, combine_df, conf, lev)
 
                     plot_ramp.plot_ts_contingency()
 

@@ -82,15 +82,15 @@ class plot_ramp:
         plot_duration_df(fn_df, 0, 0.2, 'purple')
 
         ax2.set_ylim([0.7, 1.2])
-        ax2.set_ylabel('periods of classified ramps & forecast results')
+        ax2.set_ylabel('periods of classified ramps\n& ramp forecast results')
         ax2.tick_params(axis='x', labelrotation=90)
         ax2.set_xlabel('time')
         ax2.legend()
 
         ax2_fs = 12
-        ax2.text(0.1, 0.7, 'true positive/hits', color='dodgerblue',
+        ax2.text(0.1, 0.71, 'true positive/hits', color='dodgerblue',
                  transform=ax2.transAxes, fontsize=ax2_fs)
-        ax2.text(0.5, 0.7, 'true negative', color='navy',
+        ax2.text(0.5, 0.71, 'true negative', color='navy',
                  transform=ax2.transAxes, fontsize=ax2_fs)
         ax2.text(0.1, 0.25, 'false positive/false alarm', color='red',
                  transform=ax2.transAxes, fontsize=ax2_fs)
