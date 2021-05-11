@@ -118,7 +118,7 @@ def compare(config=None):
                     process_ramp = eval_tools.get_module_class(
                         'ramps', 'process_ramp')(ramp_df)
 
-                    ramp_df = process_ramp.run()
+                    ramp_df = process_ramp.add_contingency_table()
 
                     plot_ramp = eval_tools.get_module_class(
                         'plotting', 'plot_ramp')(
