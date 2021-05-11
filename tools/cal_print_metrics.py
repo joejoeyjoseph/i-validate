@@ -12,18 +12,17 @@ def remove_na(combine_df, ramp_txt=False):
     only_na = combine_df[~combine_df.index.isin(compute_df.index)]
 
     if ramp_txt is True:
-        ramp_txt = 'ramp '
+        print_txt = 'ramp skill scores'
     else:
-        ramp_txt = ''
+        print_txt = 'metrics'
 
     print()
-    print('to calculate '+ramp_txt+'metrics, removing the following time steps'
-          + ' that contain NaN values:'
-          )
+    print('to calculate '+print_txt+', removing the following time steps ')
+    print('that contain NaN values:')
     print(only_na.index.strftime('%Y-%m-%d %H:%M:%S').values)
     print()
     print('hence, only use '+str(len(compute_df))
-          + ' time steps in data to calculate '+ramp_txt+'metrics')
+          + ' time steps in data to calculate '+print_txt)
 
     return compute_df
 
