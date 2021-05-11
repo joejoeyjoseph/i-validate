@@ -15,7 +15,7 @@ time:
 levels: 
   # height level of validation above ground level
   height_agl: 
-    - 40
+    # - 40
     - 80
     # - 120
   height_units: m
@@ -102,6 +102,6 @@ power_curve:
 # reference
 reference: 
   # variable name to be displayed
-  plot_var: wind speed
+  var: wind speed
   # variable units
   units: ms-1
