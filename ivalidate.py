@@ -110,6 +110,7 @@ def compare(config=None):
                     print()
                     print('@@~~ using ramp definition: '
                           + r.__class__.__name__+' ~~@@')
+                    print()
 
                     ramp_df = r.get_rampdf()
 
