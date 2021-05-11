@@ -15,6 +15,12 @@ class plot_ramp:
         self.combine_df = combine_df
         self.duration = conf['ramps']['duration']
 
+        self.var = conf['plot']['var']
+        if conf['plot']['units'] == 'ms-1':
+            self.units = r'm $s^{-1}$'
+        else:
+            self.units = conf['plot']['units']
+
     def get_duration_df(self, col):
 
         self.df['col_group'] = (
@@ -34,7 +40,7 @@ class plot_ramp:
 
         self.df.index = self.df.index + (pd.to_timedelta(
             str(self.duration))/2)
-        
+
         self.df['time'] = self.df.index
 
         tp_df = self.get_duration_df('true_positive')
@@ -51,6 +57,7 @@ class plot_ramp:
         for col in self.combine_df.columns:
             ax1.plot(self.combine_df.index, self.combine_df[col], label=col)
 
+        ax1.set_ylabel(self.var+' ('+self.units+')')
         ax1.legend()
 
         ax2.tick_params(left=False, labelleft=False)
@@ -73,6 +80,8 @@ class plot_ramp:
 
         ax2.set_ylim([0.7, 1.2])
         ax2.tick_params(axis='x', labelrotation=90)
+        ax2.set_xlabel('time')
+        ax2.legend()
 
         ax2_fs = 12
         ax2.text(0.1, 0.7, 'true positive/hits', color='dodgerblue',
@@ -83,7 +92,5 @@ class plot_ramp:
                  transform=ax2.transAxes, fontsize=ax2_fs)
         ax2.text(0.5, 0.25, 'false negative/misses', color='purple',
                  transform=ax2.transAxes, fontsize=ax2_fs)
-
-        ax2.legend()
 
         plt.show()
