@@ -1,4 +1,5 @@
-# Ramp magnitude
+# Classify ramp event based on the absolute difference between two points
+# (absolute ramp magnitude) at the start and end of a predefined duration.
 #
 # Joseph Lee <joseph.lee at pnnl.gov>
 
@@ -19,6 +20,7 @@ class r_magnitude:
         self.reference = conf['reference']
 
     def get_rampdf(self):
+        """Generate data frame with ramp classification."""
 
         print()
         print('classfy as a ramp event when '+self.reference['var']
@@ -31,7 +33,9 @@ class r_magnitude:
         ramp_data_dn.index = ramp_data_dn.index - pd.to_timedelta(
             str(self.ramps['duration']))
 
+        # Get data frame of lagged differences
         ramp_df = (ramp_data_dn - self.ramp_data).dropna()
+
         zeros_col = np.zeros(len(ramp_df))
         ramp_df['base_ramp'] = zeros_col
         ramp_df['comp_ramp'] = zeros_col
