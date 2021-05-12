@@ -1,4 +1,5 @@
-# Ramp magnitude
+# Classify ramp event based on the absolute difference between two points
+# (absolute ramp magnitude) at the start and end of a predefined duration.
 #
 # Joseph Lee <joseph.lee at pnnl.gov>
 
@@ -10,25 +11,38 @@ from tools import cal_print_metrics
 
 class r_magnitude:
 
-    def __init__(self, conf, ramp_data):
+    def __init__(self, conf, c, ramp_data):
 
-        self.conf = conf
+        self.base_var = conf['base']['target_var']
+        self.comp_var = c['target_var']
+        self.ramps = conf['ramps']
         self.ramp_data = ramp_data
+        self.reference = conf['reference']
 
-    def get_df(self):
+    def get_rampdf(self):
+        """Generate data frame with ramp classification."""
+
+        print()
+        print('classfy as a ramp event when '+self.reference['var']
+              + ' exceeds |'+str(self.ramps['magnitude'])
+              + '| '+self.reference['units']+' in a window of '
+              + self.ramps['duration']
+              )
 
         ramp_data_dn = self.ramp_data.copy()
         ramp_data_dn.index = ramp_data_dn.index - pd.to_timedelta(
-            str(self.conf['ramps']['duration']))
+            str(self.ramps['duration']))
 
+        # Get data frame of lagged differences
         ramp_df = (ramp_data_dn - self.ramp_data).dropna()
-        zeros_col = np.zeros(len(ramp_df))
-        ramp_df['abs_diff_base'] = zeros_col
-        ramp_df['abs_diff_comp'] = zeros_col
 
-        ramp_df.loc[abs(ramp_df['sodar_ws'])
-                    > self.conf['ramps']['magnitude'], ['abs_diff_base']] = 1
-        ramp_df.loc[abs(ramp_df['wrf_ws'])
-                    > self.conf['ramps']['magnitude'], ['abs_diff_comp']] = 1
+        zeros_col = np.zeros(len(ramp_df))
+        ramp_df['base_ramp'] = zeros_col
+        ramp_df['comp_ramp'] = zeros_col
+
+        ramp_df.loc[abs(ramp_df[self.base_var])
+                    > self.ramps['magnitude'], ['base_ramp']] = 1
+        ramp_df.loc[abs(ramp_df[self.comp_var])
+                    > self.ramps['magnitude'], ['comp_ramp']] = 1
 
         return ramp_df

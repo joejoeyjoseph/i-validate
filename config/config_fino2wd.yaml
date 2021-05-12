@@ -68,8 +68,8 @@ comp:
 # power curve
 power_curve: 
 
-# plotting 
-plot: 
+# reference
+reference: 
   # variable name to be displayed
   var: wind direction
   # variable units
