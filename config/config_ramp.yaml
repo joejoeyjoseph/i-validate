@@ -15,8 +15,8 @@ time:
 levels: 
   # height level of validation above ground level
   height_agl: 
-    - 40
-    # - 80
+    # - 40
+    - 80
     # - 120
   height_units: m
 
@@ -99,8 +99,8 @@ power_curve:
   # hub height above ground level
   hub_height: 80
 
-# plotting 
-plot: 
+# reference
+reference: 
   # variable name to be displayed
   var: wind speed
   # variable units

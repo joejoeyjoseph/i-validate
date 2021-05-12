@@ -84,8 +84,8 @@ power_curve:
   # hub height above ground level
   hub_height: 80
 
-# plotting 
-plot: 
+# reference
+reference: 
   # variable name to be displayed
   var: wind speed
   # variable units
