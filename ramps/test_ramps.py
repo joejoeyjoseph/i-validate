@@ -5,9 +5,6 @@ import pandas as pd
 import numpy as np
 import math
 from pandas._testing import assert_frame_equal
-# from unittest import TestCase
-# import mock
-# import pytest_mock
 
 from tools import eval_tools
 from ramps import process_ramp
@@ -131,77 +128,3 @@ def test_cal_far():
 def test_cal_fa():
 
     assert get_contingency_table().cal_fa() == 0.5
-
-# class SelfDrivingCarTest(TestCase):
-
-#     def setUp(self):
-
-#         self.df = read_ramp('process_ramp')(ramp_df_eg)
-
-#     def test_stop(self):
-
-#         self.df = read_ramp('process_ramp')(ramp_df_eg).add_contingency_table()
-
-#         assert_frame_equal(self.df, ramp_ss_eg)
-
-# def test_b():
-
-#     a = read_ramp('process_ramp')(ramp_df_eg)
-    
-#     ramp_df = a.add_contingency_table()
-#     print(ramp_df)
-#     print(a)
-#     print(dir(a))
-#     print(a.true_pos)
-#     print(a.cal_pod())
-#     a.cal_pod(10)
-
-
-
-# def test_spy_function(mocker):
-
-#     # mymodule declares `myfunction` which just returns 42
-#     # import mymodule
-
-#     from ramps import process_ramp
-
-#     # assert_frame_equal(process_ramp.add_contingency_table(ramp_df_eg), ramp_ss_eg)
-
-#     spy = mocker.spy(process_ramp.process_ramp, 'add_contingency_table')
-#     # assert mymodule.myfunction() == 42
-#     assert spy() == 1
-#     # assert spy.spy_return == 42
-
-
-# class abc(TestCase):
-
-#     @mock.patch('ramps.process_ramp.process_ramp.add_contingency_table')
-
-#     def test_a(self, mock_assignment):
-
-#         print(self.true_pos)
-        
-
-    #     self.a = read_ramp('process_ramp')(ramp_df_eg).add_contingency_table()
-
-    #     assert self.a.true_pos == 1
-
-# def test_a():
-
-#     print(dir(read_ramp('process_ramp')(ramp_df_eg)))
-
-#     df = read_ramp('process_ramp')(ramp_df_eg).add_contingency_table()
-
-#     # df2 = read_ramp('process_ramp')(ramp_df_eg).cal_pod()
-
-#     r = read_ramp('process_ramp')
-
-#     print(df.head())
-
-#     print(r)
-
-#     print(r.cal_pod(df))
-
-    # read_ramp
-
-    # print(read_ramp('process_ramp')(df).cal_pod())
