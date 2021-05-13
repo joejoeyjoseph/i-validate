@@ -53,8 +53,7 @@ class process_ramp:
 
         return self.df
 
-    def cal_print_scores(self):
-        """Calculate and print different skill scores."""
+    def cal_pod(self):
 
         pod = self.true_pos/(self.true_pos+self.false_neg)
         print('Probability of detection, or Ramp capture, or Hit percentage '
@@ -63,12 +62,20 @@ class process_ramp:
               + str(np.round(pod, 3)))
         print()
 
+        return pod
+
+    def cal_csi(self):
+
         csi = self.true_pos/(self.true_pos+self.false_pos+self.false_neg)
         print('Critical success index (the fraction of observed and/or '
               + 'forecasted events ')
         print('that are correctly predicted), where 1 is perfect prediction: '
               + str(np.round(csi, 3)))
         print()
+
+        return csi
+
+    def cal_fbias(self):
 
         fbias = (self.true_pos+self.false_pos)/(self.true_pos+self.false_neg)
         print('Frequency bias score (the ratio of the frequency of forecasted '
@@ -80,17 +87,40 @@ class process_ramp:
         print('overforecast: '+str(np.round(fbias, 3)))
         print()
 
+        return fbias
+
+    def cal_far(self):
+
         far = self.false_pos/(self.true_pos+self.false_pos)
         print('False alarm ratio (the fraction of predicted ramp events '
               + 'that did not occur): '+str(np.round(far, 3)))
         print()
+
+        return far
+
+    def cal_fa(self):
 
         fa = self.true_pos/(self.true_pos+self.false_pos)
         print('Forecast accuracy, or Success ratio (the fraction of '
               + 'predicted YES events ')
         print('that occurred): '+str(np.round(fa, 3)))
 
+        return fa
+
+    def cal_css(self):
+
         pss = ((self.true_pos*self.true_neg)
                - (self.false_pos*self.false_neg))\
             / ((self.true_pos+self.false_neg)
                * (self.false_pos+self.true_neg))
+
+        return pss
+
+    def cal_print_scores(self):
+        """Calculate and print different skill scores."""
+
+        self.cal_pod()
+        self.cal_csi()
+        self.cal_fbias()
+        self.cal_far()
+        self.cal_fa()
