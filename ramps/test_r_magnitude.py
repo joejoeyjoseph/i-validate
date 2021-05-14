@@ -7,7 +7,7 @@ import math
 from pandas._testing import assert_frame_equal
 
 from tools import eval_tools
-from ramps import process_ramp
+# from ramps import process_ramp
 
 test_dir = 'ramps'
 
