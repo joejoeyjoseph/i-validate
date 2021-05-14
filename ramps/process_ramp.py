@@ -145,6 +145,8 @@ class process_ramp:
     def cal_print_scores(self):
         """Calculate and print different skill scores."""
 
+        print('ramp skill scores:')
+        print()
         self.cal_pod()
         self.cal_csi()
         self.cal_fbias()
