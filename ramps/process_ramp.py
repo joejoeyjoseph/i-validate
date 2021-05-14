@@ -53,6 +53,32 @@ class process_ramp:
 
         return self.df
 
+    def print_contingency_table(self):
+        """Print 2x2 contingency table"""
+
+        data = [
+            ['|', 'true positive: '+str(self.true_pos),
+             '|', 'false positive: '+str(self.false_pos),
+             '|', self.true_pos+self.false_pos],
+            ['|', 'false negative: '+str(self.false_neg),
+             '|', 'true negative: '+str(self.true_neg),
+             '|', self.false_neg+self.true_neg],
+            ['|', self.true_pos+self.false_neg, '|',
+             self.false_pos+self.true_neg,
+             '|', len(self.df)]
+            ]
+
+        print_df = pd.DataFrame(
+            data,
+            columns=['|', 'Benchmark: ramps', '|', 'Benchmark: no ramps',
+                     '|', 'Total'],
+            index=['Comparison: ramps', 'Comparison: no ramps', 'Total']
+            )
+
+        print('2x2 contingency table:')
+        print(print_df)
+        print()
+
     def cal_pod(self):
 
         pod = self.true_pos/(self.true_pos+self.false_neg)

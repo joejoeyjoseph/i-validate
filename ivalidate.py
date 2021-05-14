@@ -125,7 +125,7 @@ def compare(config=None):
                             ramp_df, combine_df, conf, lev)
 
                     plot_ramp.plot_ts_contingency()
-
+                    process_ramp.print_contingency_table()
                     process_ramp.cal_print_scores()
 
             combine_df.columns = pd.MultiIndex.from_product([[lev],
