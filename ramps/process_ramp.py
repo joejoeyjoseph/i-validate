@@ -1,4 +1,6 @@
 # Ramp processing
+# Derive 2x2 contingency table based on baseline vs comparison accuracy
+# Calculate different skill scores according to the contingency table
 #
 # Joseph Lee <joseph.lee at pnnl.gov>
 
