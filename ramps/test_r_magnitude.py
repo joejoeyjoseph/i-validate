@@ -1,13 +1,13 @@
-# This script runs unit tests for ramp definition files.
+# This script runs unit tests for r_magnitude.
+#
+# Joseph Lee <joseph.lee at pnnl.gov>
 
-import importlib
 import pandas as pd
 import numpy as np
 import math
 from pandas._testing import assert_frame_equal
 
 from tools import eval_tools
-from ramps import process_ramp
 
 test_dir = 'ramps'
 

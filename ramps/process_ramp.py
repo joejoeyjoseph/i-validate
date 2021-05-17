@@ -1,4 +1,6 @@
 # Ramp processing
+# Derive 2x2 contingency table based on baseline vs comparison accuracy
+# Calculate different skill scores according to the contingency table
 #
 # Joseph Lee <joseph.lee at pnnl.gov>
 
@@ -52,6 +54,32 @@ class process_ramp:
         + self.false_neg+self.true_neg == len(self.df)
 
         return self.df
+
+    def print_contingency_table(self):
+        """Print 2x2 contingency table"""
+
+        data = [
+            ['|', 'true positive: '+str(self.true_pos),
+             '|', 'false positive: '+str(self.false_pos),
+             '|', self.true_pos+self.false_pos],
+            ['|', 'false negative: '+str(self.false_neg),
+             '|', 'true negative: '+str(self.true_neg),
+             '|', self.false_neg+self.true_neg],
+            ['|', self.true_pos+self.false_neg, '|',
+             self.false_pos+self.true_neg,
+             '|', len(self.df)]
+            ]
+
+        print_df = pd.DataFrame(
+            data,
+            columns=['|', 'Benchmark: ramps', '|', 'Benchmark: no ramps',
+                     '|', 'Total'],
+            index=['Comparison: ramps', 'Comparison: no ramps', 'Total']
+            )
+
+        print('2x2 contingency table:')
+        print(print_df)
+        print()
 
     def cal_pod(self):
 
@@ -119,6 +147,8 @@ class process_ramp:
     def cal_print_scores(self):
         """Calculate and print different skill scores."""
 
+        print('ramp skill scores:')
+        print()
         self.cal_pod()
         self.cal_csi()
         self.cal_fbias()
