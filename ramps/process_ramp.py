@@ -56,7 +56,7 @@ class process_ramp:
         return self.df
 
     def print_contingency_table(self):
-        """Print 2x2 contingency table"""
+        """Print 2x2 contingency table via pandas"""
 
         data = [
             ['|', 'true positive: '+str(self.true_pos),
@@ -82,6 +82,7 @@ class process_ramp:
         print()
 
     def cal_pod(self):
+        """Probability of detection"""
 
         pod = self.true_pos/(self.true_pos+self.false_neg)
         print('Probability of detection, or Ramp capture, or Hit percentage '
@@ -145,7 +146,7 @@ class process_ramp:
         return pss
 
     def cal_print_scores(self):
-        """Calculate and print different skill scores."""
+        """Calculate and print different ramp skill scores."""
 
         print('ramp skill scores:')
         print()
