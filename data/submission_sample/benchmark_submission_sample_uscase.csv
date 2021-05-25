@@ -1,0 +1,4 @@
+time,wind-speed_40m,wind-speed_80m,wind-speed_120m,wind-direction_40m,wind-direction_80m,wind-direction_120m
+2016-09-23 12:10,5.1,6,7.2,180,181,185
+2016-09-23 12:20,5.2,6.2,7.5,180,180,185
+2016-09-23 12:30,5.1,6.1,7.4,185,186,190
