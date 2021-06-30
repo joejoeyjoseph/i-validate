@@ -12,6 +12,11 @@ class crosscheck_ts:
         self.upper = conf['time']['window']['end']
         self.lower = conf['time']['window']['start']
 
+        try:
+            self.avg_method = conf['reference']['avg_method']
+        except KeyError:
+            self.avg_method = None
+
     def trim_ts(self, ts):
         """Trim time series to within upper and lower limits,
         as declared by users.
@@ -22,18 +27,47 @@ class crosscheck_ts:
 
         return ts
 
-    def align_time(self, base, comp):
+    def align_time(self, base, c):
         """Align datetime indices of baseline and comparison datasets.
         When the length of the resultant combine data frame does not match
         the user-defined, desired data length, print error messages.
         """
 
-        base = self.trim_ts(base)
-        comp = self.trim_ts(comp)
+        print(self.avg_method)
+
+        base_data = self.trim_ts(base['data'])
+        comp_data = self.trim_ts(c['data'])
 
         # Match time series data frequencies
         # Baseline time series as 1st column
-        combine_df = pd.merge(base, comp, left_index=True, right_index=True)
+
+        # If averaging method is not defined, then perform a simple merge
+        # according to time indices
+        if self.avg_method is None:
+            combine_df = pd.merge(
+                base_data, comp_data, left_index=True, right_index=True)
+
+        # Calculate mean of data and record at the end of the time step
+        elif self.avg_method == 'end':
+
+            if base['freq'] < c['freq']:
+
+                base_data = base_data.resample(
+                    str(c['freq'])+'T', label='right', closed='right').mean()
+
+                print()
+                print('averaging baseline data of '+str(base['freq'])
+                      + ' s to '+str(c['freq'])+' s, at the end of')
+                print('the measurement period.')
+
+            if base['freq'] > c['freq']:
+
+                comp_data = comp_data.resample(
+                    str(base['freq'])+'T', label='right',
+                    closed='right').mean()
+
+            combine_df = pd.merge(
+                base_data, comp_data, left_index=True, right_index=True)
 
         t_min = combine_df.index.min()
         t_max = combine_df.index.max()
@@ -48,7 +82,7 @@ class crosscheck_ts:
         print('every '+str(freq)+' minutes, total of '+str(len(combine_df))
               + ' time steps')
 
-        data_len = (diff_minute + freq) / freq
+        # data_len = (diff_minute + freq) / freq
 
         desired_period_minute = (self.upper - self.lower).total_seconds()\
             / 60.0
