@@ -25,8 +25,8 @@ levels:
   # height level of validation above ground level
   height_agl: 
     - 40
-    - 80
-    - 120
+    # - 80
+    # - 120
   height_units: m
 
 # baseline dataset
@@ -53,19 +53,20 @@ comp:
   - name: dw
     # data directory
     path: data/submissions/Deutscher_Wetterdienst/
+    # data file
+    file: benchmark_ICON2km_wfip2_sodar.csv
     # name of data processing function
     function: submission_csv
     # names of variables in data to validate
-    var: 
-      - u
-      - v
+    # not being used in submission_csv
+    var: dummy
     # nature of variable
     # ws: wind speed -- run power curve functions
     nature: ws
     # target variable name to be displayed
-    target_var: wrf_ws
+    target_var: dw_ws
     # data frequency in minutes
-    freq: 5
+    freq: 30
     # flag value
     flag: 999
 
@@ -90,3 +91,6 @@ reference:
   var: wind speed
   # variable units
   units: ms-1
+  # temporal averaging method for analyzing both baseline and comparison datasets
+  # based on differences in data frequencies
+  avg_method: end
