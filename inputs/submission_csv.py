@@ -34,7 +34,12 @@ class submission_csv:
 
         df = df.rename(columns={col[0]: self.target_var})
 
-        df = df.set_index(df_all['time']).sort_index()
+        if 'time' in df_all.columns:
+            t_col = 'time'
+        if 'time (UTC)' in df_all.columns:
+            t_col = 'time (UTC)'
+
+        df = df.set_index(df_all[t_col]).sort_index()
         df.index.rename('t', inplace=True)
         df.index = pd.to_datetime(df.index)
 
