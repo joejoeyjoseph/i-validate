@@ -84,7 +84,7 @@ def compare(config=None):
             results = eval_tools.append_results(results, base, c, conf)
 
             # Crosscheck between datasets
-            combine_df = crosscheck_ts.align_time(base['data'], c['data'])
+            combine_df = crosscheck_ts.align_time(base, c)
 
             cal_print_metrics.run(
                 combine_df, metrics, results, ind, c, conf, base, lev
