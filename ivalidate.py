@@ -19,14 +19,11 @@ from tools import eval_tools, cal_print_metrics
 def compare(config=None):
 
     config_dir = os.path.join((pathlib.Path(os.getcwd()).parent), 'config')
-    print(config_dir)
 
     if config is None:
         config_file = os.path.join(config_dir, 'config.yaml')
     else:
         config_file = os.path.join(config_dir, config)
-
-    print(config_file)
 
     sys.path.append('.')
 
@@ -93,9 +90,13 @@ def compare(config=None):
                 combine_df, metrics, results, ind, c, conf, base, lev
                 )
 
-            metricstat_dict = {key: results[0][key] for key in conf['metrics']}
+            metricstat_dict = {key: results[ind][key] for key in conf['metrics']}
             metricstat_df = pd.DataFrame.from_dict(
-                metricstat_dict, orient='index', columns=[lev]
+                metricstat_dict, orient='index', columns=[c['target_var']]
+                )
+
+            metricstat_df.columns = pd.MultiIndex.from_product(
+                [[lev], [c['name']], metricstat_df.columns]
                 )
 
             if all_lev_stat_df.empty:
@@ -143,27 +144,39 @@ def compare(config=None):
                     process_ramp.print_contingency_table()
                     process_ramp.cal_print_scores()
 
-            combine_df.columns = pd.MultiIndex.from_product([[lev],
-                                                            combine_df.columns]
-                                                            )
+            combine_df.columns = pd.MultiIndex.from_product(
+                [[lev], [c['name']], combine_df.columns]
+                )
 
             if all_lev_df.empty:
                 all_lev_df = all_lev_df.append(combine_df)
             else:
                 all_lev_df = pd.concat([all_lev_df, combine_df], axis=1)
 
-    if 'output' in conf:
-        if conf['output']['writing'] is True:
+    if 'output' in conf and conf['output']['writing'] is True:
 
-            print(str(pathlib.Path(os.getcwd()).parent)+'/'+conf['output']['path'])
+        output_path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), conf['output']['path']
+            )
 
-            print(all_lev_stat_df)
-            print(all_lev_df)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+
+        if conf['output']['format'] == 'csv':
+
+            all_lev_df.to_csv(
+                os.path.join(output_path,
+                             'ts_'+conf['output']['org']+'.csv')
+                )
+            all_lev_stat_df.to_csv(
+                os.path.join(output_path,
+                             'metrics_'+conf['output']['org']+'.csv')
+                )
+
+    pc_results = []
 
     # For power curve
     for ind, c in enumerate(comp):
-
-        pc_results = []
 
         # If both variables are wind speeds
         # and hub height exists in user-defined validation levels
@@ -182,7 +195,7 @@ def compare(config=None):
 
             hh = p_curve['hub_height']
 
-            hhws_df = all_lev_df.xs(hh, level=0, axis=1)
+            hhws_df = all_lev_df.xs([hh, c['name']], level=0, axis=1)
 
             pc_csv = eval_tools.get_module_class(
                 'inputs', p_curve['function'])(
