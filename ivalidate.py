@@ -8,7 +8,6 @@
 
 import yaml
 import sys
-import importlib
 import os
 import pathlib
 import numpy as np
@@ -19,12 +18,15 @@ from tools import eval_tools, cal_print_metrics
 
 def compare(config=None):
 
-    config_dir = str(pathlib.Path(os.getcwd()).parent)+'/config/'
+    config_dir = os.path.join((pathlib.Path(os.getcwd()).parent), 'config')
+    print(config_dir)
 
     if config is None:
-        config_file = config_dir+'config.yaml'
+        config_file = os.path.join(config_dir, 'config.yaml')
     else:
-        config_file = config_dir+config
+        config_file = os.path.join(config_dir, config)
+
+    print(config_file)
 
     sys.path.append('.')
 
@@ -49,6 +51,7 @@ def compare(config=None):
 
     # Data frame containing data at all heights
     all_lev_df = pd.DataFrame()
+    all_lev_stat_df = pd.DataFrame()
 
     for lev in conf['levels']['height_agl']:
 
@@ -89,6 +92,18 @@ def compare(config=None):
             cal_print_metrics.run(
                 combine_df, metrics, results, ind, c, conf, base, lev
                 )
+
+            metricstat_dict = {key: results[0][key] for key in conf['metrics']}
+            metricstat_df = pd.DataFrame.from_dict(
+                metricstat_dict, orient='index', columns=[lev]
+                )
+
+            if all_lev_stat_df.empty:
+                all_lev_stat_df = all_lev_stat_df.append(metricstat_df)
+            else:
+                all_lev_stat_df = pd.concat(
+                    [all_lev_stat_df, metricstat_df], axis=1
+                    )
 
             plotting.plot_ts_line(combine_df, lev)
             plotting.plot_histogram(combine_df, lev)
@@ -136,6 +151,14 @@ def compare(config=None):
                 all_lev_df = all_lev_df.append(combine_df)
             else:
                 all_lev_df = pd.concat([all_lev_df, combine_df], axis=1)
+
+    if 'output' in conf:
+        if conf['output']['writing'] is True:
+
+            print(str(pathlib.Path(os.getcwd()).parent)+'/'+conf['output']['path'])
+
+            print(all_lev_stat_df)
+            print(all_lev_df)
 
     # For power curve
     for ind, c in enumerate(comp):
