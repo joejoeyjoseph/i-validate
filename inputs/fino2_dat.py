@@ -14,13 +14,15 @@ class fino2_dat:
 
     def __init__(self, info, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(info['path'])
+        self.path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), str(info['path'])
+            )
         self.var = info['var']
 
     def get_ts(self, lev):
         """Each directory should only contain 1 file."""
 
-        file_list = glob.glob(self.path+'/*.dat')
+        file_list = glob.glob(os.path.join(self.path, '*.dat'))
 
         if len(file_list) == 1:
 

@@ -9,7 +9,9 @@ class submission_csv:
 
     def __init__(self, info, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(info['path'])
+        self.path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), str(info['path'])
+            )
         self.file = info['file']
         self.nature = info['nature']
         self.target_var = info['target_var']
@@ -17,7 +19,7 @@ class submission_csv:
 
     def get_ts(self, lev):
 
-        df_all = pd.read_csv(self.path+'/'+self.file)
+        df_all = pd.read_csv(os.path.join(self.path, self.file))
 
         if self.nature == 'ws':
             nature = 'speed'

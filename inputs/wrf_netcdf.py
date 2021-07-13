@@ -24,7 +24,9 @@ class wrf_netcdf:
 
     def __init__(self, info, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(info['path'])
+        self.path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), str(info['path'])
+            )
         self.var = info['var']
         self.target_var = info['target_var']
         self.freq = info['freq']
@@ -63,7 +65,7 @@ class wrf_netcdf:
 
         for file in os.listdir(self.path):
 
-            data = Dataset(self.path+'/'+file, 'r')
+            data = Dataset(os.path.join(self.path, file), 'r')
             i, j = self.get_ij(data)
 
             s = file.split('_')[2]+'_'+file.split('_')[3].split('.')[0]+':'\

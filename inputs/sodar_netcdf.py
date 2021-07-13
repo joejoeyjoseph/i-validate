@@ -17,7 +17,9 @@ class sodar_netcdf:
 
     def __init__(self, info, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(info['path'])
+        self.path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), str(info['path'])
+            )
         self.var = info['var']
         self.target_var = info['target_var']
         self.freq = info['freq']
@@ -33,7 +35,7 @@ class sodar_netcdf:
 
         for file in os.listdir(self.path):
 
-            data = Dataset(self.path+'/'+file, 'r')
+            data = Dataset(os.path.join(self.path, file), 'r')
 
             s = '_'.join(file.split('.')[3:5])
             # Sodar data should be in UTC time
