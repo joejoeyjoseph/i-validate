@@ -74,15 +74,19 @@ metrics:
   
 # active metrics that require user inputs
 ramps:
-  definition: 
-    - r_magnitude
-    # - r_change_rate
-  # in units of base var
-  magnitude: 2
-  # in %
-  change_rate: 10
-  # must be a Timedelta duration argument, with numeric and units
-  duration: 4 hours
+  - definition: r_magnitude
+    # in units of base var
+    magnitude: 2
+    # must be a Timedelta duration argument, with numeric and units
+    duration: 4 hours
+  - definition: r_magnitude
+    # in units of base var
+    magnitude: 3
+    # must be a Timedelta duration argument, with numeric and units
+    duration: 4 hours
+  # - definition: r_change_rate
+    # # in %
+    # change_rate: 10
 
 # power curve
 power_curve: 
@@ -105,3 +109,16 @@ reference:
   var: wind speed
   # variable units
   units: ms-1
+  # temporal averaging method for analyzing both baseline and comparison datasets
+  # based on differences in data frequencies
+  avg_method: end
+
+# writing output file
+output:
+  writing: True
+  # path to write file
+  path: output/us
+  # organization
+  org: meso
+  # output file format
+  format: csv

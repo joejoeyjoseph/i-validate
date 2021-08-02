@@ -90,7 +90,8 @@ def compare(config=None):
                 combine_df, metrics, results, ind, c, conf, base, lev
                 )
 
-            metricstat_dict = {key: results[ind][key] for key in conf['metrics']}
+            metricstat_dict = {key: results[ind][key]
+                               for key in conf['metrics']}
             metricstat_df = pd.DataFrame.from_dict(
                 metricstat_dict, orient='index', columns=[c['target_var']]
                 )
@@ -116,18 +117,17 @@ def compare(config=None):
                     combine_df, ramp_txt=True
                     )
 
-                ramp_method = [eval_tools.get_module_class(
-                    'ramps', r)(conf, c, ramp_data)
-                    for r in conf['ramps']['definition']
-                    ]
+                for ramps in conf['ramps']:
 
-                for r in ramp_method:
+                    r = eval_tools.get_module_class(
+                        'ramps', ramps['definition'])(
+                            conf, c, ramp_data, ramps)
 
                     print()
-                    print('@@~~ calculating ramp skill scores at '+str(lev)
+                    print('@@@@@~~ calculating ramp skill scores at '+str(lev)
                           + ' '+conf['levels']['height_units']
                           + ' using definition: '
-                          + r.__class__.__name__+' ~~@@')
+                          + r.__class__.__name__+' ~~@@@@@')
 
                     ramp_df = r.get_rampdf()
 
@@ -138,7 +138,7 @@ def compare(config=None):
 
                     plot_ramp = eval_tools.get_module_class(
                         'plotting', 'plot_ramp')(
-                            ramp_df, combine_df, conf, lev)
+                            ramp_df, combine_df, conf, lev, ramps)
 
                     plot_ramp.plot_ts_contingency()
                     process_ramp.print_contingency_table()
