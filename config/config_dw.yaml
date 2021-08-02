@@ -89,6 +89,19 @@ comp:
     # flag value
     flag: 999
 
+# active metrics that require user inputs
+ramps:
+  - definition: r_magnitude
+    # in units of base var
+    magnitude: 2
+    # must be a Timedelta duration argument, with numeric and units
+    duration: 4 hours
+  - definition: r_magnitude
+    # in units of base var
+    magnitude: 3
+    # must be a Timedelta duration argument, with numeric and units
+    duration: 4 hours
+
 # power curve
 power_curve: 
   # power curve csv data location

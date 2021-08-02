@@ -81,14 +81,19 @@ class process_ramp:
         print(print_df)
         print()
 
-    def generate_contingency_df(self):
+    def generate_ramp_summary_df(self):
         """Generate data frame of contingency table."""
 
         data = {
             'true_positive': self.true_pos,
             'false_positive': self.false_pos,
             'false_negative': self.false_neg,
-            'true_negative': self.true_neg
+            'true_negative': self.true_neg,
+            'probability_of_detection': self.cal_pod(),
+            'critical_success_index': self.cal_csi(),
+            'frequency_bias_score': self.cal_fbias(),
+            'false_alarm_ratio': self.cal_far(),
+            'forecast_accuracy': self.cal_fa()
             }
 
         return pd.DataFrame.from_dict(data, orient='index')

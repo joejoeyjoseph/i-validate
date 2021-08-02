@@ -49,7 +49,7 @@ def compare(config=None):
     # Data frame containing data at all heights
     all_lev_df = pd.DataFrame()
     all_lev_stat_df = pd.DataFrame()
-    all_contingency_df = pd.DataFrame()
+    all_ramp_df = pd.DataFrame()
 
     for lev in conf['levels']['height_agl']:
 
@@ -145,24 +145,21 @@ def compare(config=None):
                     process_ramp.print_contingency_table()
                     process_ramp.cal_print_scores()
 
-                    contingency_df = process_ramp.generate_contingency_df()
-                    # contingency_df.columns = [r.get_ramp_method_name()]
-                    # print(contingency_df.columns)
+                    ramp_summary_df = process_ramp.generate_ramp_summary_df()
 
-                    # contingency_df.columns = metricstat_df.columns
-                    # print(contingency_df.columns)
-                    # print(contingency_df.columns.append('e'))
-                    contingency_df.columns = pd.MultiIndex.from_product(
+                    ramp_summary_df.columns = pd.MultiIndex.from_product(
                         [[lev], [c['name']], [c['target_var']],
                          [r.get_ramp_method_name()]]
                         )
-                    # print(contingency_df.columns)
 
-                    if all_contingency_df.empty:
-                        all_contingency_df = all_contingency_df.append(contingency_df)
+                    if all_ramp_df.empty:
+                        all_ramp_df = all_ramp_df.append(
+                            ramp_summary_df
+                            )
                     else:
-                        all_contingency_df = pd.concat([all_contingency_df, contingency_df], axis=1)
-                    # print(all_contingency_df)
+                        all_ramp_df = pd.concat(
+                            [all_ramp_df, ramp_summary_df], axis=1
+                            )
 
             combine_df.columns = pd.MultiIndex.from_product(
                 [[lev], [c['name']], combine_df.columns]
@@ -195,9 +192,9 @@ def compare(config=None):
 
             if 'ramps' in conf:
 
-                all_contingency_df.to_csv(
+                all_ramp_df.to_csv(
                     os.path.join(output_path,
-                                 'contingency_'+conf['output']['org']+'.csv')
+                                 'ramp_'+conf['output']['org']+'.csv')
                     )
 
     pc_results = []
