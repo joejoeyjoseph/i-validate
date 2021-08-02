@@ -9,11 +9,11 @@ import itertools
 class plot_ramp:
     """Class for plotting ramp results at 1 height level."""
 
-    def __init__(self, ramp_df, combine_df, conf, lev):
+    def __init__(self, ramp_df, combine_df, conf, lev, ramps):
 
         self.df = ramp_df
         self.combine_df = combine_df
-        self.duration = conf['ramps']['duration']
+        self.duration = ramps['duration']
         self.var = conf['reference']['var']
         self.lev_units = conf['levels']['height_units']
         self.lev = lev

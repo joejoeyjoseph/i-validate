@@ -11,11 +11,11 @@ from tools import cal_print_metrics
 
 class r_magnitude:
 
-    def __init__(self, conf, c, ramp_data):
+    def __init__(self, conf, c, ramp_data, ramps):
 
         self.base_var = conf['base']['target_var']
         self.comp_var = c['target_var']
-        self.ramps = conf['ramps']
+        self.ramps = ramps
         self.ramp_data = ramp_data
         self.reference = conf['reference']
 
