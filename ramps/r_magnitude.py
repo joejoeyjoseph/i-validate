@@ -34,6 +34,8 @@ class r_magnitude:
             str(self.ramps['duration']))
 
         # Get data frame of lagged differences
+        # Drop NA means dropping data points on both starting and ending
+        # points of a ramp period
         ramp_df = (ramp_data_dn - self.ramp_data).dropna()
 
         zeros_col = np.zeros(len(ramp_df))
@@ -48,7 +50,7 @@ class r_magnitude:
         return ramp_df
 
     def get_ramp_method_name(self):
-        """Get ramp method name."""
+        """Get ramp method name as column name in output file."""
 
         return self.ramps['definition']+'_'+str(self.ramps['magnitude'])\
             + self.reference['units']+'_'+self.ramps['duration']
