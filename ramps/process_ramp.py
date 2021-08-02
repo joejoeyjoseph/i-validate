@@ -56,7 +56,7 @@ class process_ramp:
         return self.df
 
     def print_contingency_table(self):
-        """Print 2x2 contingency table via pandas"""
+        """Print 2x2 contingency table via pandas."""
 
         data = [
             ['|', 'true positive: '+str(self.true_pos),
@@ -81,8 +81,20 @@ class process_ramp:
         print(print_df)
         print()
 
+    def generate_contingency_df(self):
+        """Generate data frame of contingency table."""
+
+        data = {
+            'true_positive': self.true_pos,
+            'false_positive': self.false_pos,
+            'false_negative': self.false_neg,
+            'true_negative': self.true_neg
+            }
+
+        return pd.DataFrame.from_dict(data, orient='index')
+
     def cal_pod(self):
-        """Probability of detection"""
+        """Probability of detection."""
 
         pod = self.true_pos/(self.true_pos+self.false_neg)
         print('Probability of detection, or Ramp capture, or Hit percentage '
@@ -94,6 +106,7 @@ class process_ramp:
         return pod
 
     def cal_csi(self):
+        """Critical success index."""
 
         csi = self.true_pos/(self.true_pos+self.false_pos+self.false_neg)
         print('Critical success index (the fraction of observed and/or '
@@ -105,6 +118,7 @@ class process_ramp:
         return csi
 
     def cal_fbias(self):
+        """Frequency bias score."""
 
         fbias = (self.true_pos+self.false_pos)/(self.true_pos+self.false_neg)
         print('Frequency bias score (the ratio of the frequency of forecasted '
@@ -119,6 +133,7 @@ class process_ramp:
         return fbias
 
     def cal_far(self):
+        """False alarm ratio."""
 
         far = self.false_pos/(self.true_pos+self.false_pos)
         print('False alarm ratio (the fraction of predicted ramp events '
@@ -128,6 +143,7 @@ class process_ramp:
         return far
 
     def cal_fa(self):
+        """Forecast accuracy."""
 
         fa = self.true_pos/(self.true_pos+self.false_pos)
         print('Forecast accuracy, or Success ratio (the fraction of '
@@ -136,7 +152,8 @@ class process_ramp:
 
         return fa
 
-    def cal_css(self):
+    def cal_pss(self):
+        """Peirce's skill score."""
 
         pss = ((self.true_pos*self.true_neg)
                - (self.false_pos*self.false_neg))\
