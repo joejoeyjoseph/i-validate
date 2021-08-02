@@ -16,8 +16,8 @@ levels:
   # height level of validation above ground level
   height_agl: 
     # - 40
-    - 80
-    # - 120
+    # - 80
+    - 120
   height_units: m
 
 # baseline dataset

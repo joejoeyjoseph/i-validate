@@ -15,8 +15,10 @@ class pc_csv:
 
     def __init__(self, path, file, ws, power, hhws_df, hub_height, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(path)
-        self.file = self.path+'/'+file
+        self.path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), str(path)
+            )
+        self.file = os.path.join(self.path, file)
 
         self.ws = ws
         self.power = power

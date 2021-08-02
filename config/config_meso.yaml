@@ -50,7 +50,7 @@ base:
 
 # data input to be compared with the baseline dataset
 comp:
-  - name: dw
+  - name: meso
     # data directory
     path: data/submissions/Meso/
     # data file
@@ -94,3 +94,13 @@ reference:
   # temporal averaging method for analyzing both baseline and comparison datasets
   # based on differences in data frequencies
   avg_method: end
+
+# writing output file
+output:
+  writing: True
+  # path to write file
+  path: output/us
+  # organization
+  org: meso
+  # output file format
+  format: csv

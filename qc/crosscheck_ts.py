@@ -33,8 +33,6 @@ class crosscheck_ts:
         the user-defined, desired data length, print error messages.
         """
 
-        print(self.avg_method)
-
         base_data = self.trim_ts(base['data'])
         comp_data = self.trim_ts(c['data'])
 
@@ -65,6 +63,11 @@ class crosscheck_ts:
                 comp_data = comp_data.resample(
                     str(base['freq'])+'T', label='right',
                     closed='right').mean()
+
+                print()
+                print('averaging comparison data of '+str(c['freq'])
+                      + ' s to '+str(base['freq'])+' s, at the end of')
+                print('the measurement period.')
 
             combine_df = pd.merge(
                 base_data, comp_data, left_index=True, right_index=True)

@@ -72,7 +72,7 @@ def run(combine_df, metrics, results, ind, c, conf, base, lev):
               )
         print()
 
-        for key, val in results[0].items():
+        for key, val in results[ind].items():
 
             if isinstance(val, float):
 
