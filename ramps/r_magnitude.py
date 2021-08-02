@@ -46,3 +46,9 @@ class r_magnitude:
                     > self.ramps['magnitude'], ['comp_ramp']] = 1
 
         return ramp_df
+
+    def get_ramp_method_name(self):
+        """Get ramp method name."""
+
+        return self.ramps['definition']+'_'+str(self.ramps['magnitude'])\
+            + self.reference['units']+'_'+self.ramps['duration']
