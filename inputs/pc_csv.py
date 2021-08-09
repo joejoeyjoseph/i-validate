@@ -56,7 +56,7 @@ class pc_csv:
                 power_df.loc[self.hhws_df[hh_col] > row[self.ws], p_col]\
                     = row[self.power]
 
-        self.power_df = power_df
+        self.power_df = power_df.sort_index()
 
         return self.power_df
 
