@@ -40,6 +40,8 @@ class submission_csv:
             t_col = 'time'
         if 'time (UTC)' in df_all.columns:
             t_col = 'time (UTC)'
+        if 'Date & Time (UTC)' in df_all.columns:
+            t_col = 'Date & Time (UTC)'
 
         df = df.set_index(df_all[t_col]).sort_index()
         df.index.rename('t', inplace=True)
