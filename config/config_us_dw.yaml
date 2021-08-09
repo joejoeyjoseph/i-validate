@@ -70,24 +70,13 @@ comp:
     # flag value
     flag: 999
   - name: dw3km
-    # data directory
     path: data/submissions/Deutscher_Wetterdienst/
-    # data file
     file: benchmark_ICON3km_wfip2_sodar.csv
-    # name of data processing function
     function: submission_csv
-    # names of variables in data to validate
-    # not being used in submission_csv
     var: dummy
-    # nature of variable
-    # ws: wind speed -- run power curve functions
     nature: ws
-    # target variable name to be displayed
     target_var: dw3km_ws
-    # data frequency in minutes
     freq: 30
-    # flag value
-    flag: 999
 
 # active metrics that require user inputs
 ramps:
