@@ -24,6 +24,9 @@ class submission_csv:
         if self.nature == 'ws':
             nature = 'speed'
 
+        if lev.is_integer() is False:
+            lev = str(lev).replace('.', '-')
+
         col = [s for s in df_all.columns if str(lev) in s and nature in s]
 
         df = df_all[col]
