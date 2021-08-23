@@ -27,10 +27,10 @@ class submission_csv:
         if self.nature == 'power':
             nature = 'power'
 
-        if lev.is_integer() is False:
-            lev_str = str(lev).replace('.', '-')
-        else:
+        if isinstance(lev, int):
             lev_str = str(lev)
+        else:
+            lev_str = str(lev).replace('.', '-')
 
         col = [s for s in df_all.columns if lev_str in s and nature in s]
         
@@ -38,7 +38,6 @@ class submission_csv:
         if not col:
             lev_str = str(int(float(lev)))
             col = [s for s in df_all.columns if lev_str in s and nature in s]
-        print(col)
 
         df = df_all[col]
 
