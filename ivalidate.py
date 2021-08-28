@@ -237,6 +237,7 @@ def compare(config=None):
 
             # Plot simulated power curves, not extremely useful
             # pc_csv.plot_pc()
+            
             pc_csv.plot_power_ts()
 
             pc_csv.plot_power_scatter()
