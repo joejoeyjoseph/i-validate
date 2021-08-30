@@ -34,6 +34,11 @@ class wrf_netcdf:
 
         self.loc = conf['location']
 
+        try:
+            self.select_method = conf['reference']['select_method']
+        except KeyError:
+            self.select_method = None
+
     # For WRF mountain wave demo case
     def get_ij(self, ih):
         """Return data index (i and j) for nc file at a specified target
@@ -87,6 +92,34 @@ class wrf_netcdf:
 
         df = df.set_index('t').sort_index()
 
+        # print(df.index.to_series().diff()[1:])
+        # print(df.index.to_series().diff()[1])
+        # print(type(df.index.to_series().diff()[1]))
+        # print(df.index.to_series().diff()[1:].unique())
+        # print(type(df.index.to_series().diff()[1:].unique()))
+
+        time_diff = df.index.to_series().diff()
+
+        print(df[:10])
+        if len(time_diff[1:].unique()) == 1:
+            # print(vars(time_diff[1]))
+            if self.freq > time_diff[1].components.minutes:
+                # print(self.freq)
+                # a = df.resample(
+                #     str(self.freq)+'T', label='right',
+                #     closed='right').asfreq()
+                df = df.resample(
+                    str(self.freq)+'T', label='right',
+                    closed='right')
+
+                if self.select_method == 'average':
+                    df = df.mean()
+                if self.select_method == 'instance':
+                    df = df.asfreq()
+        # print(a[:5])
+        # print(type(a))
+        # print(type(df))
+        print(df[:10])
         df = check_input_data.verify_data_file_count(df, self.target_var,
                                                      self.path, self.freq
                                                      )

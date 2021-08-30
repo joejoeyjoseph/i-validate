@@ -33,8 +33,8 @@ class submission_csv:
             lev_str = str(lev).replace('.', '-')
 
         col = [s for s in df_all.columns if lev_str in s and nature in s]
-        
-        # when col is an empty list
+
+        # When col is an empty list
         if not col:
             lev_str = str(int(float(lev)))
             col = [s for s in df_all.columns if lev_str in s and nature in s]

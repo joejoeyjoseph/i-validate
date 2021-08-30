@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+import sys
 
 
 class crosscheck_ts:
@@ -13,9 +14,11 @@ class crosscheck_ts:
         self.lower = conf['time']['window']['start']
 
         try:
-            self.avg_method = conf['reference']['avg_method']
+            self.select_data = conf['reference']['select_data']
+            self.select_method = conf['reference']['select_method']
         except KeyError:
-            self.avg_method = None
+            self.select_data = 'end'
+            self.select_method = 'instance'
 
     def trim_ts(self, ts):
         """Trim time series to within upper and lower limits,
@@ -27,6 +30,36 @@ class crosscheck_ts:
 
         return ts
 
+    def run_select_method(self, input):
+
+        if self.select_method == 'average':
+            output = input.mean()
+        if self.select_method == 'instance':
+            output = input.asfreq()
+
+        return output
+
+    def resample_to_freq(self, ts, freq):
+
+        time_diff = ts.index.to_series().diff()
+
+        if len(time_diff[1:].unique()) == 1:
+
+            if freq > time_diff[1].components.minutes:
+
+                ts = ts.resample(str(freq)+'T', label='right', closed='right')
+                print('ts')
+                print(ts)
+
+                ts = self.run_select_method(ts)
+
+        else:
+
+            print()
+            sys.exit('ERROR: TIME SERIES DOES NOT HAVE CONSTANT TIME STEPS')
+
+        return ts
+
     def align_time(self, base, c):
         """Align datetime indices of baseline and comparison datasets.
         When the length of the resultant combine data frame does not match
@@ -35,39 +68,56 @@ class crosscheck_ts:
 
         base_data = self.trim_ts(base['data'])
         comp_data = self.trim_ts(c['data'])
+        print(base_data[:10])
+        print(comp_data[:10])
+
+        base_data = self.resample_to_freq(base_data, base['freq'])
+        comp_data = self.resample_to_freq(comp_data, c['freq'])
 
         # Match time series data frequencies
-        # Baseline time series as 1st column
+        # Set baseline data time series as 1st column
 
         # If averaging method is not defined, then perform a simple merge
         # according to time indices
-        if self.avg_method is None:
+        if self.select_data is None:
+
             combine_df = pd.merge(
                 base_data, comp_data, left_index=True, right_index=True)
 
-        # Calculate mean of data and record at the end of the time step
-        elif self.avg_method == 'end':
+            print()
+            print('performing a simple merge between baseline and')
+            print('comparison datasets according to time indices')
+
+        # When declared data frequencies differ, resample according to
+        # the time indicies of the lower-frequency dataset,
+        # calculate the mean of data and record at the end of the time step
+        elif self.select_data == 'end':
 
             if base['freq'] < c['freq']:
 
                 base_data = base_data.resample(
-                    str(c['freq'])+'T', label='right', closed='right').mean()
+                    str(c['freq'])+'T', label='right', closed='right',
+                    origin=comp_data.index.min())
+
+                base_data = self.run_select_method(base_data)
 
                 print()
                 print('averaging baseline data of '+str(base['freq'])
-                      + ' s to '+str(c['freq'])+' s, at the end of')
-                print('the measurement period.')
+                      + ' minutes to '+str(c['freq'])+' minutes, at')
+                print('the end of the measurement period')
 
             if base['freq'] > c['freq']:
 
                 comp_data = comp_data.resample(
                     str(base['freq'])+'T', label='right',
-                    closed='right').mean()
+                    closed='right', origin=base_data.index.min())
+
+                comp_data = self.run_select_method(comp_data)
 
                 print()
                 print('averaging comparison data of '+str(c['freq'])
-                      + ' s to '+str(base['freq'])+' s, at the end of')
-                print('the measurement period.')
+                      + ' minutes to '+str(base['freq'])+' minutes, at')
+                print('the end of the measurement period')
 
             combine_df = pd.merge(
                 base_data, comp_data, left_index=True, right_index=True)
@@ -86,6 +136,7 @@ class crosscheck_ts:
               + ' time steps')
 
         # data_len = (diff_minute + freq) / freq
+        print(combine_df)
 
         desired_period_minute = (self.upper - self.lower).total_seconds()\
             / 60.0
