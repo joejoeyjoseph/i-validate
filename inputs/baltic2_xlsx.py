@@ -27,6 +27,8 @@ class baltic2_xlsx:
         df['t'] = df['t'].str.rsplit('+').str.get(0)
         df = df.set_index('t').sort_index()
         df.index = pd.to_datetime(df.index)
+
+        # Convert local time to UTC time
         df.index = df.index-pd.Timedelta('1h')
 
         df = df.iloc[:, :3]
