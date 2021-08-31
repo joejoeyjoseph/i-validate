@@ -1,7 +1,6 @@
 # Perform crosscheck between two datasets
 
 import pandas as pd
-import numpy as np
 import sys
 
 
@@ -31,6 +30,11 @@ class crosscheck_ts:
         return ts
 
     def run_select_method(self, input):
+        """Select data from the resampler according to the declared method.
+
+        :param str average: arithmetic mean
+        :param str instance: sample instance at the resampled time step
+        """
 
         if self.select_method == 'average':
             output = input.mean()
@@ -40,18 +44,26 @@ class crosscheck_ts:
         return output
 
     def resample_to_freq(self, ts, freq):
+        """Check the consistency of the time step frequency in a time series.
+        Resample time series only if the user-defined data frequency is lower
+        than the existing data frequency, and then derive new time series based
+        on :func:`~crosscheck_ts.crosscheck_ts.run_select_method`.
+        """
 
         time_diff = ts.index.to_series().diff()
 
         if len(time_diff[1:].unique()) == 1:
 
-            if freq > time_diff[1].components.minutes:
+            if (freq > time_diff[1].components.minutes)\
+                 and (self.select_data == 'end'):
 
                 ts = ts.resample(str(freq)+'T', label='right', closed='right')
-                print('ts')
-                print(ts)
 
                 ts = self.run_select_method(ts)
+
+                print()
+                print('resampling '+ts.columns.values[0]+' every '+str(freq)
+                      + 'minutes using the '+self.select_method+' method')
 
         else:
 
@@ -68,8 +80,6 @@ class crosscheck_ts:
 
         base_data = self.trim_ts(base['data'])
         comp_data = self.trim_ts(c['data'])
-        print(base_data[:10])
-        print(comp_data[:10])
 
         base_data = self.resample_to_freq(base_data, base['freq'])
         comp_data = self.resample_to_freq(comp_data, c['freq'])
@@ -102,9 +112,11 @@ class crosscheck_ts:
                 base_data = self.run_select_method(base_data)
 
                 print()
-                print('averaging baseline data of '+str(base['freq'])
-                      + ' minutes to '+str(c['freq'])+' minutes, at')
-                print('the end of the measurement period')
+                print('aligning the '+str(base['freq'])+'-miniute baseline '
+                      + 'data to match the '+str(c['freq'])+'-minute '
+                      + 'comparison data,')
+                print('at the end of the measurement period using the '
+                      + self.select_method+' method')
 
             if base['freq'] > c['freq']:
 
@@ -115,9 +127,11 @@ class crosscheck_ts:
                 comp_data = self.run_select_method(comp_data)
 
                 print()
-                print('averaging comparison data of '+str(c['freq'])
-                      + ' minutes to '+str(base['freq'])+' minutes, at')
-                print('the end of the measurement period')
+                print('aligning the '+str(c['freq'])+'-minute comparison '
+                      + 'data of to match the '+str(base['freq'])+'-minute '
+                      + 'baseline data,')
+                print('at the end of the measurement period using the '
+                      + self.select_method+' method')
 
             combine_df = pd.merge(
                 base_data, comp_data, left_index=True, right_index=True)
@@ -136,7 +150,6 @@ class crosscheck_ts:
               + ' time steps')
 
         # data_len = (diff_minute + freq) / freq
-        print(combine_df)
 
         desired_period_minute = (self.upper - self.lower).total_seconds()\
             / 60.0

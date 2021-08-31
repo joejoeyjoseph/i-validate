@@ -37,7 +37,7 @@ class wrf_netcdf:
         try:
             self.select_method = conf['reference']['select_method']
         except KeyError:
-            self.select_method = None
+            self.select_method = 'instance'
 
     # For WRF mountain wave demo case
     def get_ij(self, ih):
@@ -61,7 +61,9 @@ class wrf_netcdf:
         return i, j
 
     def get_ts(self, lev):
-        """Get time series at a location at a certain height."""
+        """Get time series at a location at a certain height.
+        Resample data according to user-defined data frequency. 
+        """
 
         df = pd.DataFrame({'t': [], self.target_var: []})
 
@@ -92,22 +94,13 @@ class wrf_netcdf:
 
         df = df.set_index('t').sort_index()
 
-        # print(df.index.to_series().diff()[1:])
-        # print(df.index.to_series().diff()[1])
-        # print(type(df.index.to_series().diff()[1]))
-        # print(df.index.to_series().diff()[1:].unique())
-        # print(type(df.index.to_series().diff()[1:].unique()))
-
+        # Same process as in the crosscheck_ts class
         time_diff = df.index.to_series().diff()
 
-        print(df[:10])
         if len(time_diff[1:].unique()) == 1:
-            # print(vars(time_diff[1]))
+
             if self.freq > time_diff[1].components.minutes:
-                # print(self.freq)
-                # a = df.resample(
-                #     str(self.freq)+'T', label='right',
-                #     closed='right').asfreq()
+
                 df = df.resample(
                     str(self.freq)+'T', label='right',
                     closed='right')
@@ -116,10 +109,7 @@ class wrf_netcdf:
                     df = df.mean()
                 if self.select_method == 'instance':
                     df = df.asfreq()
-        # print(a[:5])
-        # print(type(a))
-        # print(type(df))
-        print(df[:10])
+
         df = check_input_data.verify_data_file_count(df, self.target_var,
                                                      self.path, self.freq
                                                      )
