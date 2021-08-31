@@ -59,6 +59,14 @@ class fino2_dats:
                 df = df.set_index('t').sort_index()
                 df.index = pd.to_datetime(df.index)
 
+                # FINO data are averages centered at each 10-minute period
+                # Data between 10:30 and 10:40 are averaged and labelled as
+                # 10:35
+                # Apply correction to label data at the end of each period
+                # Hence data between 10:30 and 10:40 are averaged and labelled
+                # as 10:40
+                df.index = df.index+pd.Timedelta('5minutes')
+
                 # Extract only 1 column of data
                 out_df = df.loc[:, [self.var]]
                 out_df.rename(
