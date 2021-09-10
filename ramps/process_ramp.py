@@ -43,15 +43,15 @@ class process_ramp:
         # for each time step
         for i, row in self.df.iterrows():
             assert np.sum([row['true_positive'], row['false_positive'],
-                   row['false_negative'], row['true_negative']]) == 1
+                          row['false_negative'], row['true_negative']]) == 1
 
         self.true_pos = self.df['true_positive'].sum()
         self.false_pos = self.df['false_positive'].sum()
         self.false_neg = self.df['false_negative'].sum()
         self.true_neg = self.df['true_negative'].sum()
 
-        assert self.true_pos+self.false_pos
-        + self.false_neg+self.true_neg == len(self.df)
+        assert self.true_pos+self.false_pos\
+               + self.false_neg+self.true_neg == len(self.df)
 
         return self.df
 
@@ -85,6 +85,9 @@ class process_ramp:
         """Generate data frame of contingency table."""
 
         data = {
+            'time_sample': len(self.df),
+            'base_ramp': self.df['base_ramp'].sum(),
+            'comp_ramp': self.df['comp_ramp'].sum(),
             'true_positive': self.true_pos,
             'false_positive': self.false_pos,
             'false_negative': self.false_neg,
@@ -98,66 +101,92 @@ class process_ramp:
 
         return pd.DataFrame.from_dict(data, orient='index')
 
-    def cal_pod(self):
+    def cal_pod(self, msg=False):
         """Probability of detection."""
 
-        pod = self.true_pos/(self.true_pos+self.false_neg)
-        print('Probability of detection, or Ramp capture, or Hit percentage '
-              + '(the fraction of ')
-        print('observed ramp events that are actually forecasted): '
-              + str(np.round(pod, 3)))
-        print()
+        # To avoid runtime warning
+        if (self.true_pos+self.false_neg) == 0:
+            pod = np.nan
+        else:
+            pod = self.true_pos/(self.true_pos+self.false_neg)
+
+        if msg is True:
+            print('Probability of detection, or Ramp capture, or Hit '
+                  + 'percentage (the fraction of ')
+            print('observed ramp events that are actually forecasted): '
+                  + str(np.round(pod, 3)))
+            print()
 
         return pod
 
-    def cal_csi(self):
+    def cal_csi(self, msg=False):
         """Critical success index."""
 
-        csi = self.true_pos/(self.true_pos+self.false_pos+self.false_neg)
-        print('Critical success index (the fraction of observed and/or '
-              + 'forecasted events ')
-        print('that are correctly predicted), where 1 is perfect prediction: '
-              + str(np.round(csi, 3)))
-        print()
+        if (self.true_pos+self.false_pos+self.false_neg) == 0:
+            csi = np.nan
+        else:
+            csi = self.true_pos/(self.true_pos+self.false_pos+self.false_neg)
+
+        if msg is True:
+            print('Critical success index (the fraction of observed and/or '
+                  + 'forecasted events ')
+            print('that are correctly predicted), where 1 is perfect '
+                  + 'prediction: '+str(np.round(csi, 3)))
+            print()
 
         return csi
 
-    def cal_fbias(self):
+    def cal_fbias(self, msg=False):
         """Frequency bias score."""
 
-        fbias = (self.true_pos+self.false_pos)/(self.true_pos+self.false_neg)
-        print('Frequency bias score (the ratio of the frequency of forecasted '
-              + 'ramp events to the ')
-        print('frequency of observed ramp events), where a negative value '
-              + 'represents the system ')
-        print('tends to underforecast and a positive value represents '
-              + 'the system tends to ')
-        print('overforecast: '+str(np.round(fbias, 3)))
-        print()
+        if (self.true_pos+self.false_neg) == 0:
+            fbias = np.nan
+        else:
+            fbias = (self.true_pos+self.false_pos)/(self.true_pos+self.false_neg)
+
+        if msg is True:
+            print('Frequency bias score (the ratio of the frequency of '
+                  + 'forecasted ramp events to the ')
+            print('frequency of observed ramp events), where a negative value '
+                  + 'represents the system ')
+            print('tends to underforecast and a positive value represents '
+                  + 'the system tends to ')
+            print('overforecast: '+str(np.round(fbias, 3)))
+            print()
 
         return fbias
 
-    def cal_far(self):
+    def cal_far(self, msg=False):
         """False alarm ratio."""
 
-        far = self.false_pos/(self.true_pos+self.false_pos)
-        print('False alarm ratio (the fraction of predicted ramp events '
-              + 'that did not occur): '+str(np.round(far, 3)))
-        print()
+        if (self.true_pos+self.false_pos) == 0:
+            far = np.nan
+        else:
+            far = self.false_pos/(self.true_pos+self.false_pos)
+
+        if msg is True:
+            print('False alarm ratio (the fraction of predicted ramp events '
+                  + 'that did not occur): '+str(np.round(far, 3)))
+            print()
 
         return far
 
-    def cal_fa(self):
+    def cal_fa(self, msg=False):
         """Forecast accuracy."""
 
-        fa = self.true_pos/(self.true_pos+self.false_pos)
-        print('Forecast accuracy, or Success ratio (the fraction of '
-              + 'predicted YES events ')
-        print('that occurred): '+str(np.round(fa, 3)))
+        if (self.true_pos+self.false_pos) == 0:
+            fa = np.nan
+        else:
+            fa = self.true_pos/(self.true_pos+self.false_pos)
+
+        if msg is True:
+            print('Forecast accuracy, or Success ratio (the fraction of '
+                  + 'predicted YES events ')
+            print('that occurred): '+str(np.round(fa, 3)))
 
         return fa
 
-    def cal_pss(self):
+    def cal_pss(self, msg=False):
         """Peirce's skill score."""
 
         pss = ((self.true_pos*self.true_neg)
@@ -172,8 +201,8 @@ class process_ramp:
 
         print('ramp skill scores:')
         print()
-        self.cal_pod()
-        self.cal_csi()
-        self.cal_fbias()
-        self.cal_far()
-        self.cal_fa()
+        self.cal_pod(msg=True)
+        self.cal_csi(msg=True)
+        self.cal_fbias(msg=True)
+        self.cal_far(msg=True)
+        self.cal_fa(msg=True)
