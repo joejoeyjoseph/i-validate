@@ -55,7 +55,7 @@ class crosscheck_ts:
         if len(time_diff[1:].unique()) == 1:
 
             if (freq > time_diff[1].components.minutes)\
-                 and (self.select_data == 'end'):
+               and (self.select_data == 'end'):
 
                 ts = ts.resample(str(freq)+'T', label='right', closed='right')
 
@@ -63,11 +63,12 @@ class crosscheck_ts:
 
                 print()
                 print('resampling '+ts.columns.values[0]+' every '+str(freq)
-                      + 'minutes using the '+self.select_method+' method')
+                      + ' minutes using the '+self.select_method+' method')
 
         else:
 
             print()
+            print(time_diff[1:].unique())
             sys.exit('ERROR: TIME SERIES DOES NOT HAVE CONSTANT TIME STEPS')
 
         return ts
@@ -113,9 +114,10 @@ class crosscheck_ts:
 
                 print()
                 print('aligning the '+str(base['freq'])+'-miniute baseline '
-                      + 'data to match the '+str(c['freq'])+'-minute '
-                      + 'comparison data,')
-                print('at the end of the measurement period using the '
+                      + 'data ('+base_data.columns.values[0]+') to match the ')
+                print(str(c['freq'])+'-minute comparison data ('
+                      + comp_data.columns.values[0]+'), at the end of the')
+                print('measurement period using the '
                       + self.select_method+' method')
 
             if base['freq'] > c['freq']:
@@ -127,10 +129,11 @@ class crosscheck_ts:
                 comp_data = self.run_select_method(comp_data)
 
                 print()
-                print('aligning the '+str(c['freq'])+'-minute comparison '
-                      + 'data of to match the '+str(base['freq'])+'-minute '
-                      + 'baseline data,')
-                print('at the end of the measurement period using the '
+                print('aligning the '+str(c['freq'])+'-miniute comparison '
+                      + 'data ('+comp_data.columns.values[0]+') to match the ')
+                print(str(base['freq'])+'-minute baseline data ('
+                      + base_data.columns.values[0]+'), at the end of the')
+                print('measurement period using the '
                       + self.select_method+' method')
 
             combine_df = pd.merge(
