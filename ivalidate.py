@@ -143,13 +143,14 @@ def compare(config=None):
 
                     plot_ramp.plot_ts_contingency()
                     process_ramp.print_contingency_table()
-                    process_ramp.cal_print_scores()
+                    # Print skill scores
+                    # process_ramp.cal_print_scores()
 
                     ramp_summary_df = process_ramp.generate_ramp_summary_df()
 
                     ramp_summary_df.columns = pd.MultiIndex.from_product(
                         [[lev], [c['name']], [c['target_var']],
-                         [r.get_ramp_method_name()]]
+                         [r.ramp_nature], [r.get_ramp_method_name()]]
                         )
 
                     if all_ramp_df.empty:
