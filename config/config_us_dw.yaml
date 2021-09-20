@@ -16,6 +16,7 @@ time:
 metrics:
   - rmse
   - crmse
+  - nrmse
   - bias
   - bias_pct
   - mae
@@ -78,18 +79,34 @@ comp:
     target_var: dw3km_ws
     freq: 30
 
-# active metrics that require user inputs
+# ramps
 ramps:
-  - definition: r_magnitude
+  # all ramps
+  - definition: r_abs_magnitude
     # in units of base var
     magnitude: 2
     # must be a Timedelta duration argument, with numeric and units
     duration: 4 hours
-  - definition: r_magnitude
-    # in units of base var
+  - definition: r_abs_magnitude
     magnitude: 3
-    # must be a Timedelta duration argument, with numeric and units
     duration: 4 hours
+  # up ramps
+  - definition: r_magnitude
+    magnitude: 2
+    duration: 4 hours
+  - definition: r_magnitude
+    magnitude: 3
+    duration: 4 hours
+  # down ramps
+  - definition: r_magnitude
+    magnitude: -2
+    duration: 4 hours
+  - definition: r_magnitude
+    magnitude: -3
+    duration: 4 hours
+# - definition: r_change_rate
+  # # in %
+  # change_rate: 10
 
 # power curve
 power_curve: 
@@ -112,9 +129,6 @@ reference:
   var: wind speed
   # variable units
   units: ms-1
-  # temporal averaging method for analyzing both baseline and comparison datasets
-  # based on differences in data frequencies
-  avg_method: end
 
 # writing output file
 output:

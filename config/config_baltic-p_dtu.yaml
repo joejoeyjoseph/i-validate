@@ -107,18 +107,18 @@ power_curve:
 # reference
 reference: 
   # variable name to be displayed
-  var: wind speed
+  var: power
   # variable units
-  units: ms-1
+  units: MW
   # temporal averaging method for analyzing both baseline and comparison datasets
   # based on differences in data frequencies
-  avg_method: end
+  select_data: end
 
 # writing output file
 output:
   writing: False
   # path to write file
-  path: output/baltic
+  path: output/baltic-p
   # organization
   org: dtu
   # output file format
