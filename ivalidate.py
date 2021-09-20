@@ -8,7 +8,6 @@
 
 import yaml
 import sys
-import importlib
 import os
 import pathlib
 import numpy as np
@@ -19,12 +18,12 @@ from tools import eval_tools, cal_print_metrics
 
 def compare(config=None):
 
-    config_dir = str(pathlib.Path(os.getcwd()).parent)+'/config/'
+    config_dir = os.path.join((pathlib.Path(os.getcwd()).parent), 'config')
 
     if config is None:
-        config_file = config_dir+'config.yaml'
+        config_file = os.path.join(config_dir, 'config.yaml')
     else:
-        config_file = config_dir+config
+        config_file = os.path.join(config_dir, config)
 
     sys.path.append('.')
 
@@ -49,6 +48,8 @@ def compare(config=None):
 
     # Data frame containing data at all heights
     all_lev_df = pd.DataFrame()
+    all_lev_stat_df = pd.DataFrame()
+    all_ramp_df = pd.DataFrame()
 
     for lev in conf['levels']['height_agl']:
 
@@ -84,11 +85,28 @@ def compare(config=None):
             results = eval_tools.append_results(results, base, c, conf)
 
             # Crosscheck between datasets
-            combine_df = crosscheck_ts.align_time(base['data'], c['data'])
+            combine_df = crosscheck_ts.align_time(base, c)
 
             cal_print_metrics.run(
                 combine_df, metrics, results, ind, c, conf, base, lev
                 )
+
+            metricstat_dict = {key: results[ind][key]
+                               for key in conf['metrics']}
+            metricstat_df = pd.DataFrame.from_dict(
+                metricstat_dict, orient='index', columns=[c['target_var']]
+                )
+
+            metricstat_df.columns = pd.MultiIndex.from_product(
+                [[lev], [c['name']], metricstat_df.columns]
+                )
+
+            if all_lev_stat_df.empty:
+                all_lev_stat_df = all_lev_stat_df.append(metricstat_df)
+            else:
+                all_lev_stat_df = pd.concat(
+                    [all_lev_stat_df, metricstat_df], axis=1
+                    )
 
             plotting.plot_ts_line(combine_df, lev)
             plotting.plot_histogram(combine_df, lev)
@@ -100,18 +118,17 @@ def compare(config=None):
                     combine_df, ramp_txt=True
                     )
 
-                ramp_method = [eval_tools.get_module_class(
-                    'ramps', r)(conf, c, ramp_data)
-                    for r in conf['ramps']['definition']
-                    ]
+                for ramps in conf['ramps']:
 
-                for r in ramp_method:
+                    r = eval_tools.get_module_class(
+                        'ramps', ramps['definition'])(
+                            conf, c, ramp_data, ramps)
 
                     print()
-                    print('@@~~ calculating ramp skill scores at '+str(lev)
+                    print('@@@@@~~ calculating ramp skill scores at '+str(lev)
                           + ' '+conf['levels']['height_units']
                           + ' using definition: '
-                          + r.__class__.__name__+' ~~@@')
+                          + r.__class__.__name__+' ~~@@@@@')
 
                     ramp_df = r.get_rampdf()
 
@@ -122,25 +139,69 @@ def compare(config=None):
 
                     plot_ramp = eval_tools.get_module_class(
                         'plotting', 'plot_ramp')(
-                            ramp_df, combine_df, conf, lev)
+                            ramp_df, combine_df, conf, lev, ramps)
 
                     plot_ramp.plot_ts_contingency()
                     process_ramp.print_contingency_table()
-                    process_ramp.cal_print_scores()
+                    # Print skill scores
+                    # process_ramp.cal_print_scores()
 
-            combine_df.columns = pd.MultiIndex.from_product([[lev],
-                                                            combine_df.columns]
-                                                            )
+                    ramp_summary_df = process_ramp.generate_ramp_summary_df()
+
+                    ramp_summary_df.columns = pd.MultiIndex.from_product(
+                        [[lev], [c['name']], [c['target_var']],
+                         [r.ramp_nature], [r.get_ramp_method_name()]]
+                        )
+
+                    if all_ramp_df.empty:
+                        all_ramp_df = all_ramp_df.append(
+                            ramp_summary_df
+                            )
+                    else:
+                        all_ramp_df = pd.concat(
+                            [all_ramp_df, ramp_summary_df], axis=1
+                            )
+
+            combine_df.columns = pd.MultiIndex.from_product(
+                [[lev], [c['name']], combine_df.columns]
+                )
 
             if all_lev_df.empty:
                 all_lev_df = all_lev_df.append(combine_df)
             else:
                 all_lev_df = pd.concat([all_lev_df, combine_df], axis=1)
 
+    if 'output' in conf and conf['output']['writing'] is True:
+
+        output_path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), conf['output']['path']
+            )
+
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+
+        if conf['output']['format'] == 'csv':
+
+            all_lev_df.to_csv(
+                os.path.join(output_path,
+                             'ts_'+conf['output']['org']+'.csv')
+                )
+            all_lev_stat_df.to_csv(
+                os.path.join(output_path,
+                             'metrics_'+conf['output']['org']+'.csv')
+                )
+
+            if 'ramps' in conf:
+
+                all_ramp_df.to_csv(
+                    os.path.join(output_path,
+                                 'ramp_'+conf['output']['org']+'.csv')
+                    )
+
+    pc_results = []
+
     # For power curve
     for ind, c in enumerate(comp):
-
-        pc_results = []
 
         # If both variables are wind speeds
         # and hub height exists in user-defined validation levels
@@ -159,7 +220,7 @@ def compare(config=None):
 
             hh = p_curve['hub_height']
 
-            hhws_df = all_lev_df.xs(hh, level=0, axis=1)
+            hhws_df = all_lev_df.xs([hh, c['name']], level=0, axis=1)
 
             pc_csv = eval_tools.get_module_class(
                 'inputs', p_curve['function'])(
@@ -177,6 +238,7 @@ def compare(config=None):
 
             # Plot simulated power curves, not extremely useful
             # pc_csv.plot_pc()
+            
             pc_csv.plot_power_ts()
 
             pc_csv.plot_power_scatter()

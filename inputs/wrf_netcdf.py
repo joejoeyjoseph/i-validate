@@ -24,13 +24,20 @@ class wrf_netcdf:
 
     def __init__(self, info, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(info['path'])
+        self.path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), str(info['path'])
+            )
         self.var = info['var']
         self.target_var = info['target_var']
         self.freq = info['freq']
         self.flag = info['flag']
 
         self.loc = conf['location']
+
+        try:
+            self.select_method = conf['reference']['select_method']
+        except KeyError:
+            self.select_method = 'instance'
 
     # For WRF mountain wave demo case
     def get_ij(self, ih):
@@ -54,7 +61,9 @@ class wrf_netcdf:
         return i, j
 
     def get_ts(self, lev):
-        """Get time series at a location at a certain height."""
+        """Get time series at a location at a certain height.
+        Resample data according to user-defined data frequency. 
+        """
 
         df = pd.DataFrame({'t': [], self.target_var: []})
 
@@ -63,7 +72,7 @@ class wrf_netcdf:
 
         for file in os.listdir(self.path):
 
-            data = Dataset(self.path+'/'+file, 'r')
+            data = Dataset(os.path.join(self.path, file), 'r')
             i, j = self.get_ij(data)
 
             s = file.split('_')[2]+'_'+file.split('_')[3].split('.')[0]+':'\
@@ -84,6 +93,22 @@ class wrf_netcdf:
             df = df.append([{'t': t, self.target_var: ws}])
 
         df = df.set_index('t').sort_index()
+
+        # Same process as in the crosscheck_ts class
+        time_diff = df.index.to_series().diff()
+
+        if len(time_diff[1:].unique()) == 1:
+
+            if self.freq > time_diff[1].components.minutes:
+
+                df = df.resample(
+                    str(self.freq)+'T', label='right',
+                    closed='right')
+
+                if self.select_method == 'average':
+                    df = df.mean()
+                if self.select_method == 'instance':
+                    df = df.asfreq()
 
         df = check_input_data.verify_data_file_count(df, self.target_var,
                                                      self.path, self.freq

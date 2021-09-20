@@ -15,8 +15,10 @@ class pc_csv:
 
     def __init__(self, path, file, ws, power, hhws_df, hub_height, conf):
 
-        self.path = str(pathlib.Path(os.getcwd()).parent)+'/'+str(path)
-        self.file = self.path+'/'+file
+        self.path = os.path.join(
+            (pathlib.Path(os.getcwd()).parent), str(path)
+            )
+        self.file = os.path.join(self.path, file)
 
         self.ws = ws
         self.power = power
@@ -54,7 +56,7 @@ class pc_csv:
                 power_df.loc[self.hhws_df[hh_col] > row[self.ws], p_col]\
                     = row[self.power]
 
-        self.power_df = power_df
+        self.power_df = power_df.sort_index()
 
         return self.power_df
 

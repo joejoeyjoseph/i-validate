@@ -12,12 +12,23 @@ time:
     # validation period end time
     end: 2016-09-25 12:00:00
 
+# validation metrics to be calculated and plotted
+# passive metrics that do not require user inputs
+metrics:
+  - rmse
+  - crmse
+  - nrmse
+  - bias
+  - bias_pct
+  - mae
+  - mae_pct
+
 levels: 
   # height level of validation above ground level
   height_agl: 
-    # - 40
+    - 40
     - 80
-    # - 120
+    - 120
   height_units: m
 
 # baseline dataset
@@ -42,7 +53,7 @@ base:
 
 # data input to be compared with the baseline dataset
 comp:
-  - name: wrf
+  - name: nrel
     # data directory
     path: data/mw_data_wrf
     # duplicate & missing data, miss first 12 hours
@@ -56,33 +67,42 @@ comp:
     # ws: wind speed -- run power curve functions
     nature: ws
     # target variable name to be displayed
-    target_var: wrf_ws
+    target_var: nrel_wrf_ws
     # data frequency in minutes
-    freq: 5
+    # even nrel wrf outputs are 5-minute data, 
+    # set this to 30 for baseline to average to 30-minute data
+    freq: 30
     # flag value
     flag: 999
-
-# validation metrics to be calculated and plotted
-# passive metrics that do not require user inputs
-metrics:
-  - rmse
-  - crmse
-  - bias
-  - bias_pct
-  - mae
-  - mae_pct
   
-# active metrics that require user inputs
+# ramps
 ramps:
-  definition: 
-    - r_magnitude
-    # - r_change_rate
-  # in units of base var
-  magnitude: 2
-  # in %
-  change_rate: 10
-  # must be a Timedelta duration argument, with numeric and units
-  duration: 4 hours
+  # all ramps
+  - definition: r_abs_magnitude
+    # in units of base var
+    magnitude: 2
+    # must be a Timedelta duration argument, with numeric and units
+    duration: 4 hours
+  - definition: r_abs_magnitude
+    magnitude: 3
+    duration: 4 hours
+  # up ramps
+  - definition: r_magnitude
+    magnitude: 2
+    duration: 4 hours
+  - definition: r_magnitude
+    magnitude: 3
+    duration: 4 hours
+  # down ramps
+  - definition: r_magnitude
+    magnitude: -2
+    duration: 4 hours
+  - definition: r_magnitude
+    magnitude: -3
+    duration: 4 hours
+  # - definition: r_change_rate
+    # # in %
+    # change_rate: 10
 
 # power curve
 power_curve: 
@@ -105,3 +125,13 @@ reference:
   var: wind speed
   # variable units
   units: ms-1
+
+# writing output file
+output:
+  writing: True
+  # path to write file
+  path: output/us
+  # organization
+  org: nrel
+  # output file format
+  format: csv

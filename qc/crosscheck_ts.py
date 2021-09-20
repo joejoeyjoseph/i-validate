@@ -1,7 +1,7 @@
 # Perform crosscheck between two datasets
 
 import pandas as pd
-import numpy as np
+import sys
 
 
 class crosscheck_ts:
@@ -13,9 +13,11 @@ class crosscheck_ts:
         self.lower = conf['time']['window']['start']
 
         try:
-            self.avg_method = conf['reference']['avg_method']
+            self.select_data = conf['reference']['select_data']
+            self.select_method = conf['reference']['select_method']
         except KeyError:
-            self.avg_method = None
+            self.select_data = 'end'
+            self.select_method = 'instance'
 
     def trim_ts(self, ts):
         """Trim time series to within upper and lower limits,
@@ -27,44 +29,112 @@ class crosscheck_ts:
 
         return ts
 
+    def run_select_method(self, input):
+        """Select data from the resampler according to the declared method.
+
+        :param str average: arithmetic mean
+        :param str instance: sample instance at the resampled time step
+        """
+
+        if self.select_method == 'average':
+            output = input.mean()
+        if self.select_method == 'instance':
+            output = input.asfreq()
+
+        return output
+
+    def resample_to_freq(self, ts, freq):
+        """Check the consistency of the time step frequency in a time series.
+        Resample time series only if the user-defined data frequency is lower
+        than the existing data frequency, and then derive new time series based
+        on :func:`~crosscheck_ts.crosscheck_ts.run_select_method`.
+        """
+
+        time_diff = ts.index.to_series().diff()
+
+        if len(time_diff[1:].unique()) == 1:
+
+            if (freq > time_diff[1].components.minutes)\
+               and (self.select_data == 'end'):
+
+                ts = ts.resample(str(freq)+'T', label='right', closed='right')
+
+                ts = self.run_select_method(ts)
+
+                print()
+                print('resampling '+ts.columns.values[0]+' every '+str(freq)
+                      + ' minutes using the '+self.select_method+' method')
+
+        else:
+
+            print()
+            print(time_diff[1:].unique())
+            sys.exit('ERROR: TIME SERIES DOES NOT HAVE CONSTANT TIME STEPS')
+
+        return ts
+
     def align_time(self, base, c):
         """Align datetime indices of baseline and comparison datasets.
         When the length of the resultant combine data frame does not match
         the user-defined, desired data length, print error messages.
         """
 
-        print(self.avg_method)
-
         base_data = self.trim_ts(base['data'])
         comp_data = self.trim_ts(c['data'])
 
+        base_data = self.resample_to_freq(base_data, base['freq'])
+        comp_data = self.resample_to_freq(comp_data, c['freq'])
+
         # Match time series data frequencies
-        # Baseline time series as 1st column
+        # Set baseline data time series as 1st column
 
         # If averaging method is not defined, then perform a simple merge
         # according to time indices
-        if self.avg_method is None:
+        if self.select_data is None:
+
             combine_df = pd.merge(
                 base_data, comp_data, left_index=True, right_index=True)
 
-        # Calculate mean of data and record at the end of the time step
-        elif self.avg_method == 'end':
+            print()
+            print('performing a simple merge between baseline and')
+            print('comparison datasets according to time indices')
+
+        # When declared data frequencies differ, resample according to
+        # the time indicies of the lower-frequency dataset,
+        # calculate the mean of data and record at the end of the time step
+        elif self.select_data == 'end':
 
             if base['freq'] < c['freq']:
 
                 base_data = base_data.resample(
-                    str(c['freq'])+'T', label='right', closed='right').mean()
+                    str(c['freq'])+'T', label='right', closed='right',
+                    origin=comp_data.index.min())
+
+                base_data = self.run_select_method(base_data)
 
                 print()
-                print('averaging baseline data of '+str(base['freq'])
-                      + ' s to '+str(c['freq'])+' s, at the end of')
-                print('the measurement period.')
+                print('aligning the '+str(base['freq'])+'-miniute baseline '
+                      + 'data ('+base_data.columns.values[0]+') to match the ')
+                print(str(c['freq'])+'-minute comparison data ('
+                      + comp_data.columns.values[0]+'), at the end of the')
+                print('measurement period using the '
+                      + self.select_method+' method')
 
             if base['freq'] > c['freq']:
 
                 comp_data = comp_data.resample(
                     str(base['freq'])+'T', label='right',
-                    closed='right').mean()
+                    closed='right', origin=base_data.index.min())
+
+                comp_data = self.run_select_method(comp_data)
+
+                print()
+                print('aligning the '+str(c['freq'])+'-miniute comparison '
+                      + 'data ('+comp_data.columns.values[0]+') to match the ')
+                print(str(base['freq'])+'-minute baseline data ('
+                      + base_data.columns.values[0]+'), at the end of the')
+                print('measurement period using the '
+                      + self.select_method+' method')
 
             combine_df = pd.merge(
                 base_data, comp_data, left_index=True, right_index=True)
