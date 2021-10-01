@@ -1,5 +1,11 @@
 # i-validate
 
+## Deprecation notice
+
+We have changed the name of our validation tool to **WE-Validate**, please see our new GitHub repo at [WE-Validate](https://github.com/joejoeyjoseph/WE-Validate). This repo is no longer regularly updated as of October 2021. 
+
+## Introduction
+
 This infrastructure code enables comparison of time series from arbitrary data sources using user-defined metrics. The tool is designed to be simple, modulized, and extensible. 
 
 The default branch is `main`, and active development is under `dev`. Pull requests from `dev` to `main` will be done regularly.
